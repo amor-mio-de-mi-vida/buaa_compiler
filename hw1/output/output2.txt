@@ -1,0 +1,11 @@
+no1: 21371476
+no2: c324 is c324
+no4: no3: the anwser is 1
+no4: no3: the anwser is 4
+no4: no3: the anwser is 7
+no5: i is 10
+no6: c(3489) is a const integer, and we get 3,4,5
+no7: asjdl is 31 and i is 0
+no8: asjdl is 31 and i is 1
+no9: asjdl is 31 and i is 2
+no10: asjdl is 31 and i is 3
