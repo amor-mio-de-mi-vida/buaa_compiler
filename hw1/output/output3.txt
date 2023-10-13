@@ -1,0 +1,10 @@
+no1: 21371476
+no2: a[0] is 9 and a[1] is 4, b is 6
+no3: b[0] is -2 and b[1] is -3
+no4: asd is 1, qwe is -2, weq is -6, wqe is 36
+no5: b[1] is -3, b[0] is -2
+no6: qwe - weq is 1
+no7: wqe is 36
+no8: ad is 0
+no9: ad is 0
+no10: it's over!
