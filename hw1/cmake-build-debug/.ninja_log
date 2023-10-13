@@ -1,6 +1,0 @@
-# ninja log v5
-0	250	1694947728735533745	CMakeFiles/hw1.dir/generate.cpp.o	1aa0535c7a91e3ef
-251	276	1694947728763726660	hw1	e2d2feead35f1fbf
-6	197	1695549045091501248	CMakeFiles/hw1.dir/output/testfile2.c.o	382d65a22c998d31
-6	197	1695549045091501289	CMakeFiles/hw1.dir/output/testfile1.c.o	67878cb1ae930f0c
-6	518	1695549045411750006	CMakeFiles/hw1.dir/generate.cpp.o	1aa0535c7a91e3ef

@@ -1,1 +1,0 @@
-zip result.zip testfile1.txt testfile2.txt testfile3.txt testfile4.txt input1.txt input2.txt input3.txt input4.txt output1.txt output2.txt output3.txt output4.txt 
