@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="CMakePresetLoader">{
+  &quot;useNewFormat&quot;: true
+}</component>
+  <component name="CMakeReloadState">
+    <option name="reloaded" value="true" />
+  </component>
+  <component name="CMakeRunConfigurationManager">
+    <generated>
+      <config projectName="hw3" targetName="hw3" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2bb90d0c-5bc3-4b38-bb32-429707389cfa" name="更改" comment="">
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/Testing/Temporary/LastTest.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Testing/Temporary/LastTest.log" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/parser.cpp" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProjectApplicationVersion">
+    <option name="ide" value="CLion" />
+    <option name="majorVersion" value="2023" />
+    <option name="minorVersion" value="2.2" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="2WBSKEbbjHI957lBHObnmJxKPfU" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/yanghesen/Desktop/buaa_compiler/hw3&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;CPPToolchains&quot;,
+    &quot;two.files.diff.last.used.file&quot;: &quot;/Users/yanghesen/Desktop/buaa_compiler/hw3/parserTest/C/output/output7.txt&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/cmake-build-debug" />
+    </key>
+  </component>
+  <component name="RunManager" selected="CMake Application.hw3">
+    <configuration name="hw3" type="CMakeListConfigurationType" factoryName="CMakeListConfigurationFactory" temporary="true">
+      <method v="2" />
+    </configuration>
+    <configuration name="hw3" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="hw3" TARGET_NAME="hw3" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="hw3" RUN_TARGET_NAME="hw3">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="hw3" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="CMake Application.hw3" />
+      <item itemvalue="CMake Debug.hw3" />
+      <item itemvalue="Python.test" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="CMake Debug.hw3" />
+        <item itemvalue="Python.test" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="2bb90d0c-5bc3-4b38-bb32-429707389cfa" name="更改" comment="" />
+      <created>1696204414512</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1696204414512</updated>
+      <workItem from="1696204415887" duration="18599000" />
+      <workItem from="1696296199374" duration="45000" />
+      <workItem from="1696296246329" duration="81000" />
+      <workItem from="1696296329153" duration="167000" />
+      <workItem from="1696296497857" duration="350000" />
+      <workItem from="1696296850633" duration="332000" />
+      <workItem from="1696297185834" duration="255000" />
+      <workItem from="1696297443580" duration="1971000" />
+      <workItem from="1696299619278" duration="13333000" />
+      <workItem from="1696319171996" duration="523000" />
+      <workItem from="1696319698538" duration="5941000" />
+      <workItem from="1696325726116" duration="3182000" />
+      <workItem from="1696328922084" duration="3080000" />
+      <workItem from="1696335443270" duration="2222000" />
+      <workItem from="1696337675313" duration="483000" />
+      <workItem from="1696338161572" duration="672000" />
+      <workItem from="1696338837918" duration="2491000" />
+      <workItem from="1696341339861" duration="10828000" />
+      <workItem from="1696388333311" duration="2686000" />
+      <workItem from="1696391132219" duration="642000" />
+      <workItem from="1696395708537" duration="598000" />
+      <workItem from="1696566860143" duration="427000" />
+      <workItem from="1696567290378" duration="1264000" />
+      <workItem from="1696568584612" duration="7000" />
+      <workItem from="1696568596433" duration="1975000" />
+      <workItem from="1696570664398" duration="3287000" />
+      <workItem from="1696574219196" duration="2097000" />
+      <workItem from="1696576656706" duration="660000" />
+      <workItem from="1696578127484" duration="1590000" />
+      <workItem from="1696579724890" duration="1866000" />
+      <workItem from="1696648388520" duration="757000" />
+      <workItem from="1696686469052" duration="39000" />
+      <workItem from="1696686512830" duration="5000" />
+      <workItem from="1696760841240" duration="885000" />
+      <workItem from="1696764368624" duration="746000" />
+      <workItem from="1696765718077" duration="13644000" />
+      <workItem from="1696845398919" duration="645000" />
+      <workItem from="1696861901481" duration="1355000" />
+      <workItem from="1696944602953" duration="2814000" />
+      <workItem from="1696947478925" duration="263000" />
+      <workItem from="1696947854931" duration="560000" />
+      <workItem from="1696948435064" duration="3442000" />
+      <workItem from="1696954812187" duration="3153000" />
+      <workItem from="1696958639121" duration="25000" />
+      <workItem from="1696983091550" duration="2507000" />
+      <workItem from="1696988751952" duration="1111000" />
+      <workItem from="1697024843960" duration="2334000" />
+      <workItem from="1697044583347" duration="3000" />
+      <workItem from="1697044594790" duration="38000" />
+      <workItem from="1697044813042" duration="2689000" />
+      <workItem from="1697071478822" duration="5184000" />
+      <workItem from="1697083344504" duration="6301000" />
+      <workItem from="1697115181240" duration="4197000" />
+      <workItem from="1697123104781" duration="105000" />
+      <workItem from="1697123212034" duration="146000" />
+      <workItem from="1697123372892" duration="4698000" />
+      <workItem from="1697166520234" duration="653000" />
+      <workItem from="1697172594328" duration="114000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VCPKGProject">
+    <isAutomaticEditVcpkgJson value="false" />
+    <isAutomaticCheckingOnLaunch value="false" />
+    <isAutomaticFoundErrors value="true" />
+    <isAutomaticFoundErrors value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="CMakeRunConfiguration">
+        <watch expression="TokenList" language="ObjectiveC" />
+        <watch expression="iter" language="ObjectiveC" />
+        <watch expression="colNo" language="ObjectiveC" />
+        <watch expression="rowNo" language="ObjectiveC" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>
