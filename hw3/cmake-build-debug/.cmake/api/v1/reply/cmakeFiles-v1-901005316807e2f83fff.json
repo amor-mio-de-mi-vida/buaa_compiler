@@ -753,8 +753,8 @@
 	"kind" : "cmakeFiles",
 	"paths" : 
 	{
-		"build" : "/Users/yanghesen/Desktop/compiler/hw3/cmake-build-debug",
-		"source" : "/Users/yanghesen/Desktop/compiler/hw3"
+		"build" : "/Users/yanghesen/Desktop/buaa_compiler/hw3/cmake-build-debug",
+		"source" : "/Users/yanghesen/Desktop/buaa_compiler/hw3"
 	},
 	"version" : 
 	{
