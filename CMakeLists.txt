@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-project(hw3)
+project(buaa_compiler)
 
 set(CMAKE_CXX_STANDARD 17)
 

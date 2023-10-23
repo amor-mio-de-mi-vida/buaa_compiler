@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/yanghesen/Desktop/buaa_compiler/hw3/cmake-build-debug"
+			"value" : "/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -151,10 +151,10 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "CXX compiler"
+					"value" : "No help, variable specified on the command line."
 				}
 			],
-			"type" : "STRING",
+			"type" : "UNINITIALIZED",
 			"value" : "/usr/bin/clang++"
 		},
 		{
@@ -247,10 +247,10 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "C compiler"
+					"value" : "No help, variable specified on the command line."
 				}
 			],
-			"type" : "STRING",
+			"type" : "UNINITIALIZED",
 			"value" : "/usr/bin/clang"
 		},
 		{
@@ -479,7 +479,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/yanghesen/Desktop/buaa_compiler/hw3/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -539,7 +539,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/yanghesen/Desktop/buaa_compiler/hw3"
+			"value" : "/Users/yanghesen/Desktop/buaa_compiler"
 		},
 		{
 			"name" : "CMAKE_INSTALL_NAME_TOOL",
@@ -819,7 +819,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "hw3"
+			"value" : "buaa_compiler"
 		},
 		{
 			"name" : "CMAKE_RANLIB",
@@ -1102,6 +1102,78 @@
 			"value" : "FALSE"
 		},
 		{
+			"name" : "buaa_compiler_BINARY_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug"
+		},
+		{
+			"name" : "buaa_compiler_IS_TOP_LEVEL",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "ON"
+		},
+		{
+			"name" : "buaa_compiler_SOURCE_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "/Users/yanghesen/Desktop/buaa_compiler"
+		},
+		{
+			"name" : "h_BINARY_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug"
+		},
+		{
+			"name" : "h_IS_TOP_LEVEL",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "ON"
+		},
+		{
+			"name" : "h_SOURCE_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "/Users/yanghesen/Desktop/buaa_compiler"
+		},
+		{
 			"name" : "hw3_BINARY_DIR",
 			"properties" : 
 			[
@@ -1111,7 +1183,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/yanghesen/Desktop/buaa_compiler/hw3/cmake-build-debug"
+			"value" : "/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug"
 		},
 		{
 			"name" : "hw3_IS_TOP_LEVEL",
@@ -1135,7 +1207,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/yanghesen/Desktop/buaa_compiler/hw3"
+			"value" : "/Users/yanghesen/Desktop/buaa_compiler"
 		}
 	],
 	"kind" : "cache",
