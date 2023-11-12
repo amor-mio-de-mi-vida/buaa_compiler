@@ -193,7 +193,6 @@ void getSTRCON(const std::string& str) {
         getLexerErrorMessage("expect \"");
     } // 可能会出错
     std::string name = str.substr(0, len+1);
-    checkInvalidChar(name);
     Token token = Token(name, "STRCON", rowNo, colNo);
     colNo += len + 1;
     TokenList.push_back(token);

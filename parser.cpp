@@ -5,12 +5,23 @@
 #include "lexer.h"
 #include "parser.h"
 #include "error.h"
+#include "utils.h"
 #include <cassert>
 
 extern bool parser;
+extern bool error;
 extern std::vector<Token>::iterator iter;
 extern std::vector<Token> TokenList;
 extern ofstream fout;
+int isCircle = 0; // 错误处理判断是否在解析循环块
+
+bool preReadExp() {
+    if (isToken("PLUS", false,false,__FUNCTION__) || isToken("MINU", false,false,__FUNCTION__) || isToken("NOT", false,false,__FUNCTION__)
+        || isToken("IDENFR", false,false,__FUNCTION__) || isToken("LPARENT", false,false,__FUNCTION__) || isToken("INTCON", false,false,__FUNCTION__)) {
+        return true;
+    }
+    return false;
+}
 
 bool isToken(const char *str, bool getNext, bool errorMessage, const char* funcname) {
     if (iter != TokenList.end() && iter->getType() == str) {
@@ -30,6 +41,7 @@ bool isToken(const char *str, bool getNext, bool errorMessage, const char* funcn
 
 void parseCompUnit() {
     iter = TokenList.begin();
+    pushSymbolTable();
 
     while (isToken("VOIDTK",false, false, __FUNCTION__) || isToken("CONSTTK",false, false, __FUNCTION__) || isToken("INTTK",false, false, __FUNCTION__)) {
         if (isToken("VOIDTK", false, false, __FUNCTION__)) {
@@ -81,7 +93,7 @@ void parseConstDecl() {
         }
         if (isToken("SEMICN", true, true, __FUNCTION__)) {
         } else {
-            assert(0);
+            printError((iter-1)->getRowNo(), 'i', "parseConstDecl");
         }
         printParserResult("<ConstDecl>");
     } else {
@@ -97,14 +109,22 @@ void parseBType() {
 }
 
 void parseConstDef() {
+    int type = 0;
+    std::string constName = iter->getName();
+    int row = iter->getRowNo();
+
     parseIdent();
     while(isToken("LBRACK", true, false, __FUNCTION__)) {
+        type++;
         parseConstExp();
         if (isToken("RBRACK", true, true,__FUNCTION__)) {
         } else {
-            assert(0);
+            printError((iter-1)->getRowNo(), 'k', "praseConstDef");
         }
     }
+
+    checkVarSymbol(row, "parseConstDef", constName, type, 1);
+
     if (isToken("ASSIGN", true, true, __FUNCTION__)) {
         parseConstInitVal();
     } else {
@@ -113,8 +133,9 @@ void parseConstDef() {
     printParserResult("<ConstDef>");
 }
 
-void parseIdent() {
+std::string parseIdent() {
     if (isToken("IDENFR", true, true, __FUNCTION__)) {
+        return (iter-1)->getName();
     } else {
         assert(0);
     }
@@ -147,20 +168,28 @@ void parseVarDecl() {
     }
     if(isToken("SEMICN", true, true, __FUNCTION__)) {
     } else {
-        assert(0);
+        printError((iter-1)->getRowNo(), 'i', "parseVarDecl");
     }
     printParserResult("<VarDecl>");
 }
 
 void parseVarDef() {
+    int type = 0; // 变量的类型
+    std::string varName = iter->getName(); // 变量的名字
+    int row = iter->getRowNo();
+
     parseIdent();
     while(isToken("LBRACK", true, false, __FUNCTION__)) {
+        type++;
         parseConstExp();
         if (isToken("RBRACK", true, true, __FUNCTION__)) {
         } else {
-            assert(0);
+            printError((iter-1)->getRowNo(), 'k', "parseVarDef");
         }
     }
+
+    checkVarSymbol(row, "parseVarDef", varName, type, 0);
+
     if (isToken("ASSIGN", true, false, __FUNCTION__)) {
         parseInitVal();
     } else {
@@ -188,35 +217,52 @@ void parseInitVal() {
 }
 
 void parseFuncDef() {
+    std::string func_retype = iter->getType();
     parseFuncType();
+    std::string funcname = iter->getName();
+    int row = iter->getRowNo();
     parseIdent();
+
+    checkFuncSymbol(row, "parseFuncDef", funcname, func_retype);
+
+    pushSymbolTable();
     if (isToken("LPARENT", true, true, __FUNCTION__)) {
         if (isToken("RPARENT", true, false, __FUNCTION__)) {
             parseBlock();
+            int row0 = (iter-1)->getRowNo();
+            checkHasReturn(row0, "parseFuncDef");
             printParserResult("<FuncDef>");
-            return;
         } else {
-            parseFuncFParams();
-            if (isToken("RPARENT", true, true, __FUNCTION__)) {
-                parseBlock();
-            } else {
-                assert(0);
+            if (isToken("INTTK", false, false, __FUNCTION__)) {
+                parseFuncFParams(funcname);
             }
+            if (isToken("RPARENT", true, true, __FUNCTION__)) {
+            } else {
+                printError((iter-1)->getRowNo(), 'j', "parseFuncDef");
+            }
+            parseBlock();
             printParserResult("<FuncDef>");
         }
     } else {
         assert(0);
     }
+    popSymbolTable(); // 弹出本层符号表
 }
 
 void parseMainFuncDef() {
     if (isToken("INTTK", true, true, __FUNCTION__)) {
+        int row = iter->getRowNo();
+        checkFuncSymbol(row, "parseMainFuncDef", "main", "INTTK");
         if (isToken("MAINTK", true, true, __FUNCTION__)) {
             if (isToken("LPARENT", true, true, __FUNCTION__)) {
                 if (isToken("RPARENT", true, true, __FUNCTION__)) {
+                    pushSymbolTable(); // 压入新的符号表
                     parseBlock();
+                    int row0 = (iter-1)->getRowNo();
+                    checkHasReturn(row0, "parseMainFuncDef");
+                    popSymbolTable(); // 弹出符号表
                 } else {
-                    assert(0);
+                    printError((iter-1)->getRowNo(),'j',"parseMainFuncDef");
                 }
             } else {
                 assert(0);
@@ -239,33 +285,41 @@ void parseFuncType() {
     printParserResult("<FuncType>");
 }
 
-void parseFuncFParams() {
-    parseFuncFParam();
+void parseFuncFParams(const std::string& funcname) {
+    int type = parseFuncFParam();
+    pushSymbolFuncParam(funcname, type);
     while(isToken("COMMA", true, false, __FUNCTION__)) {
-        parseFuncFParam();
+        type = parseFuncFParam();
+        pushSymbolFuncParam(funcname, type);
     }
     printParserResult("<FuncFParams>");
 }
 
-void parseFuncFParam() {
+int parseFuncFParam() {
+    int type = 0;
     parseBType();
-    parseIdent();
+    int row = iter->getRowNo();
+    std::string name = parseIdent();
+
     if (isToken("LBRACK", true, false, __FUNCTION__)) {
+        type++;
         if (isToken("RBRACK", true, true, __FUNCTION__)) {
             if (isToken("LBRACK", true, false, __FUNCTION__)) {
+                type++;
                 parseConstExp();
                 if (isToken("RBRACK", true, true, __FUNCTION__)) {
                 } else {
-                    assert(0);
+                    printError((iter-1)->getRowNo(),'k',"parseFuncFParam");
                 }
             } else {
             }
         } else {
-            assert(0);
+            printError((iter-1)->getRowNo(),'k',"parseFuncFParam");
         }
-    } else {
     }
+    checkVarSymbol(row, "parseFuncFParam", name, type, 0);
     printParserResult("<FuncFParam>");
+    return type;
 }
 
 void parseBlock() {
@@ -295,10 +349,18 @@ void parseStmt() {
     } else if (isToken("IFTK", false, false, __FUNCTION__)) {
         parseIfStmt();
     } else if (isToken("FORTK", false, false, __FUNCTION__)) {
+        isCircle++;
         parseForstmt();
+        isCircle--;
     } else if (isToken("BREAKTK",false, false, __FUNCTION__)) {
+        if (!isCircle) {    // 检查是否在循环块中
+            printError(iter->getRowNo(),'m', "parseBreakStmt");
+        }
         parseBreakStmt();
     } else if (isToken("CONTINUETK", false, false, __FUNCTION__)) {
+        if (!isCircle) {    //检查是否在循环块中
+            printError(iter->getRowNo(),'m', "parseContinueStmt");
+        }
         parseContinueStmt();
     } else if (isToken("RETURNTK", false, false, __FUNCTION__)) {
         parseReturnStmt();
@@ -311,10 +373,13 @@ void parseStmt() {
             } else {
                 auto it = iter;
                 bool mod = parser;
+                bool mode = error;
                 parser = false;
+                error = false;
                 parseLVal();
                 if (isToken("ASSIGN", true, false, __FUNCTION__)) {
                     parser = mod;
+                    error = mode;
                     if (isToken("GETINTTK", false, false, __FUNCTION__)) {
                         iter = it;
                         parseGetintStmt();
@@ -324,6 +389,7 @@ void parseStmt() {
                     }
                 } else {   // 回溯
                     parser = mod;
+                    error = mode;
                     iter = it;
                     parseExpStmt();
                 }
@@ -336,12 +402,14 @@ void parseStmt() {
 }
 
 void parseAssignStmt() {
+    std::string name = iter->getName();
     parseLVal();
+    checkConst(name, (iter-1)->getRowNo(), "parseAssignStmt");
     if (isToken("ASSIGN", true, true, __FUNCTION__)) {
         parseExp();
         if (isToken("SEMICN", true, true, __FUNCTION__)) {
         } else {
-            assert(0);
+            printError((iter-1)->getRowNo(), 'i', "parseAssignStmt");
         }
     } else {
         assert(0);
@@ -354,7 +422,7 @@ void parseExpStmt() {
         parseExp();
         if (isToken("SEMICN", true, true, __FUNCTION__)) {
         } else {
-            assert(0);
+            printError((iter-1)->getRowNo(), 'i', "parseExpStmt");
         }
     }
 }
@@ -371,10 +439,9 @@ void parseIfStmt() {
                 parseStmt();
                 if (isToken("ELSETK", true, false, __FUNCTION__)) {
                     parseStmt();
-                } else {
                 }
             } else {
-                assert(0);
+                printError((iter-1)->getRowNo(), 'j', "parseIfStmt");
             }
         } else {
             assert(0);
@@ -392,7 +459,7 @@ void parseForstmt() {
                 parseForStmt();
                 if (isToken("SEMICN", true, true, __FUNCTION__)) {
                 } else {
-                    assert(0);
+                    printError((iter-1)->getRowNo(), 'i', "parseForStmt");
                 }
             }
             if (isToken("SEMICN", true, false, __FUNCTION__)) {
@@ -400,7 +467,7 @@ void parseForstmt() {
                 parseCond();
                 if (isToken("SEMICN", true, true, __FUNCTION__)) {
                 } else {
-                    assert(0);
+                    printError((iter-1)->getRowNo(), 'i', "parseForStmt");
                 }
             }
             if (isToken("RPARENT", true, false, __FUNCTION__)) {
@@ -408,7 +475,7 @@ void parseForstmt() {
                 parseForStmt();
                 if (isToken("RPARENT", true, true, __FUNCTION__)) {
                 } else {
-                    assert(0);
+                    printError((iter-1)->getRowNo(), 'j', "parseForStmt");
                 }
             }
             parseStmt();
@@ -424,7 +491,7 @@ void parseBreakStmt() {
     if (isToken("BREAKTK", true, true, __FUNCTION__)) {
         if (isToken("SEMICN", true, true, __FUNCTION__)) {
         } else {
-            assert(0);
+            printError((iter-1)->getRowNo(), 'i', "parseBreakStmt");
         }
     } else {
         assert(0);
@@ -435,7 +502,7 @@ void parseContinueStmt() {
     if (isToken("CONTINUETK", true, true, __FUNCTION__)) {
         if (isToken("SEMICN", true, true, __FUNCTION__)) {
         } else {
-            assert(0);
+            printError((iter-1)->getRowNo(), 'i', "parseContinueStmt");
         }
     } else {
         assert(0);
@@ -443,13 +510,16 @@ void parseContinueStmt() {
 }
 
 void parseReturnStmt() {
+    int row = iter->getRowNo();
     if (isToken("RETURNTK", true, true, __FUNCTION__)) {
         if (isToken("SEMICN", true, false, __FUNCTION__)) {
+            checkReturn(row, "parseReturnStmt", 0);
         } else {
             parseExp();
+            checkReturn(row, "parseReturnStmt", 1);
             if (isToken("SEMICN", true, true, __FUNCTION__)) {
             } else {
-                assert(0);
+                printError((iter-1)->getRowNo(), 'i', "parseReturnStmt");
             }
             return;
         }
@@ -459,17 +529,19 @@ void parseReturnStmt() {
 }
 
 void parseGetintStmt() {
+    std::string name = iter->getName();
     parseLVal();
+    checkConst(name, (iter-1)->getRowNo(), "parseGetintStmt");
     if (isToken("ASSIGN", true, true, __FUNCTION__)) {
         if (isToken("GETINTTK",true, true, __FUNCTION__)) {
             if (isToken("LPARENT", true, true, __FUNCTION__)) {
                 if (isToken("RPARENT",true, true, __FUNCTION__)) {
                     if (isToken("SEMICN", true, true, __FUNCTION__)) {
                     } else {
-                        assert(0);
+                        printError((iter-1)->getRowNo(), 'i', "parseGetIntStmt");
                     }
                 } else {
-                    assert(0);
+                    printError((iter-1)->getRowNo(), 'j', "parseGetIntStmt");
                 }
             } else {
                 assert(0);
@@ -485,17 +557,24 @@ void parseGetintStmt() {
 void parsePrintfStmt() {
     if (isToken("PRINTFTK", true, true, __FUNCTION__)) {
         if (isToken("LPARENT", true, true, __FUNCTION__)) {
+            checkInvalidChar(iter->getRowNo(), iter->getName());
             if (isToken("STRCON", true, true, __FUNCTION__)) {
+                int row = (iter-1)->getRowNo();
+                int num = getParamNumber(*(iter-1));
                 while (isToken("COMMA", true, false, __FUNCTION__)) {
                     parseExp();
+                    num--;
+                }
+                if(num) {
+                    printError(row,'l', "parsePrintfStmt");
                 }
                 if (isToken("RPARENT", true, true, __FUNCTION__)) {
                     if (isToken("SEMICN", true, true, __FUNCTION__ )) {
                     } else {
-                        assert(0);
+                        printError((iter-1)->getRowNo(), 'i', "parsePrintfStmt");
                     }
                 } else {
-                    assert(0);
+                    printError((iter-1)->getRowNo(), 'j', "parsePrintfStmt");
                 }
             } else {
                 assert(0);
@@ -518,9 +597,10 @@ void parseForStmt() {
     printParserResult("<ForStmt>");
 }
 
-void parseExp() {
-    parseAddExp();
+int parseExp() {
+    int type = parseAddExp();
     printParserResult("<Exp>");
+    return type;
 }
 
 void parseCond() {
@@ -528,31 +608,40 @@ void parseCond() {
     printParserResult("<Cond>");
 }
 
-void parseLVal() {
-    parseIdent();
+int parseLVal() {
+    std::string name = parseIdent();
+    int type = getVarType(name);
+    int row = (iter-1)->getRowNo();
+    checkVarDefine(row, "parseLVal", name);
+
     while(isToken("LBRACK", true, false, __FUNCTION__)) {
+        type--;
         parseExp();
         if (isToken("RBRACK", true, true, __FUNCTION__)) {
         } else {
-            assert(0);
+            printError((iter-1)->getRowNo(),'k',"parseLVal");
         }
     }
     printParserResult("<LVal>");
+    return type;
 }
 
-void parsePrimaryExp() {
+int parsePrimaryExp() {
+    int type;
     if(isToken("LPARENT", true, false, __FUNCTION__)) {
-        parseExp();
+        type = parseExp();
         if (isToken("RPARENT", true, true, __FUNCTION__)) {
         } else {
-            assert(0);
+            printError((iter-1)->getRowNo(),'k',"parsePrimaryExp");
         }
     } else if(isToken("IDENFR", false, false, __FUNCTION__)) {
-        parseLVal();
+        type = parseLVal();
     } else {
+        type = 0;
         parseNumber();
     }
     printParserResult("<PrimaryExp>");
+    return type;
 }
 
 void parseNumber() {
@@ -563,32 +652,42 @@ void parseNumber() {
     }
 }
 
-void parseUnaryExp() {
+int parseUnaryExp() {
+    int type;
     if (isToken("PLUS", false, false, __FUNCTION__) || isToken("MINU", false, false, __FUNCTION__) || isToken("NOT", false, false, __FUNCTION__)) {
         parseUnaryOp();
-        parseUnaryExp();
+        type = parseUnaryExp();
     } else if (isToken("IDENFR", false, false, __FUNCTION__)) {
         if (preReadToken(1) != nullptr && preReadToken(1)->getType() == "LPARENT") {
-            parseIdent();
+            std::string name = parseIdent();
+            int row = (iter-1)->getRowNo();
+            checkFuncDefine(row, "parseUnaryExp", name);
+            type = getFuncType(name) - 1;
+
             if (isToken("LPARENT", true, true, __FUNCTION__)) {
                 if (isToken("RPARENT", true, false, __FUNCTION__)) {
+                    checkParaNum(row, "parseFuncRParams", name, 0);
                 } else {
-                    parseFuncRParams();
+                    if (preReadExp()) {
+                        int num = parseFuncRParams(row, name);
+                        checkParaNum(row, "parseFuncRParams", name, num);
+                    }
                     if (isToken("RPARENT", true, true, __FUNCTION__)) {
                     } else {
-                        assert(0);
+                        printError((iter-1)->getRowNo(),'j',"parseUnaryExp");
                     }
                 }
             } else {
                 assert(0);
             }
         } else {
-            parsePrimaryExp();
+            type = parsePrimaryExp();
         }
     } else {
-        parsePrimaryExp();
+        type = parsePrimaryExp();
     }
     printParserResult("<UnaryExp>");
+    return type;
 }
 
 void parseUnaryOp() {
@@ -601,16 +700,22 @@ void parseUnaryOp() {
     printParserResult("<UnaryOp>");
 }
 
-void parseFuncRParams() {
-    parseExp();
+int parseFuncRParams(int row, const std::string& funcname) {
+    int num = 0;
+    int type = parseExp();
+    checkParaType(row, "parseFuncRParams", funcname, num, type);
+    num++;
     while (isToken("COMMA", true, false, __FUNCTION__)) {
-        parseExp();
+        type = parseExp();
+        checkParaType(row, "parseFuncRParams", funcname, num, type);
+        num++;
     }
     printParserResult("<FuncRParams>");
+    return num;
 }
 
-void parseMulExp() {
-    parseUnaryExp();
+int parseMulExp() {
+    int type = parseUnaryExp();
     if (isToken("MULT", false, false, __FUNCTION__ ) || isToken("DIV", false, false, __FUNCTION__ ) || isToken("MOD", false, false, __FUNCTION__ )) {
         printParserResult("<MulExp>");
         while (isToken("MULT", true, false, __FUNCTION__) || isToken("DIV", true, false, __FUNCTION__) ||
@@ -621,10 +726,11 @@ void parseMulExp() {
     } else {
         printParserResult("<MulExp>");
     }
+    return type;
 }
 
-void parseAddExp() {
-    parseMulExp();
+int parseAddExp() {
+    int type = parseMulExp();
     if (isToken("PLUS", false, false, __FUNCTION__) || isToken("MINU", false, false, __FUNCTION__)) {
         printParserResult("<AddExp>");
         while(isToken("PLUS", true, false, __FUNCTION__) || isToken("MINU", true, false, __FUNCTION__)) {
@@ -634,6 +740,7 @@ void parseAddExp() {
     } else {
         printParserResult("<AddExp>");
     }
+    return type;
 }
 
 void parseRelExp() {

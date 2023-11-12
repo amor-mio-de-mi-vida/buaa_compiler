@@ -9,4 +9,6 @@ add_executable(hw3 main.cpp
         parser.h
         lexer.cpp
         lexer.h
-        error.cpp)
+        error.cpp
+        utils.cpp
+        utils.h)

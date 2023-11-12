@@ -7,10 +7,11 @@ using namespace std;
 
 int rowNo = 1;  // 当前解析的行号
 int colNo = 0;  // 当前解析的列号
+bool debug = false;
 bool comment = false; // 处理可换行的注释
 bool lexer = false; // 词法分析debug开关
-bool parser = true; // 语法分析debug开关
-bool error = false;
+bool parser = false; // 语法分析debug开关
+bool error = true;
 ifstream fin; // 输入文件的文件描述符
 ofstream fout; // 输出文件的文件描述符
 ofstream ferr;
