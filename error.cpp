@@ -14,6 +14,7 @@ extern ofstream ferr;
 extern bool error;
 extern bool debug;
 extern int colNo;
+extern int isDup;
 
 extern int currentSymbolTableId;
 extern int currentSymbolId;
@@ -81,6 +82,7 @@ void checkFuncSymbol(int row, const char* str, const std::string& name, const st
 void checkSymbol(int row, const char* str, const std::string& name, int type, int is_const, const std::string& func_retype) {
     if (searchSymbolTable(name, type, false) != -1) {
         printError(row, 'b', str);
+        isDup++;
     } else {
         pushSymbol(name, type, is_const, func_retype);
     }
