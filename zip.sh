@@ -1,1 +1,0 @@
-zip buaa_compiler.zip *.cpp *.h
