@@ -1,0 +1,30 @@
+declare i32 @getint()          ; 读取一个整数
+declare void @putint(i32)      ; 输出一个整数
+declare void @putch(i32)       ; 输出一个字符
+declare void @putstr(i8*)      ; 输出字符串
+
+@a = dso_local global [6 x i32] [i32 1, i32 2, i32 3, i32 4, i32 5, i32 6]
+define dso_local i32 @a2(i32 %temp5, i32* %temp6) {
+    %temp4 = alloca i32*
+    store i32* %temp6, i32** %temp4
+    %temp3 = alloca i32
+    store i32 %temp5, i32* %temp3
+    %temp7 = load i32, i32* %temp3
+    %temp9 = getelementptr i32, i32* %temp4, i32 0, i32 2
+    %temp8 = load i32, i32* %temp9
+    %temp10 = add i32 %temp7, %temp8
+    ret i32 %temp10
+}
+
+define dso_local i32 @main() {
+    %temp12 = alloca i32
+    %temp14 = getelementptr i32, i32* @a, i32 0, i32 4
+    %temp13 = load i32, i32* %temp14
+    %temp16 = getelementptr [6 x i32], [6 x i32]* @a, i32 0, i32 0
+    %temp17 = call i32 @a2(i32 %temp13, i32* %temp16)
+    store i32 %temp17, i32* %temp12
+    %temp18 = load i32, i32* %temp12
+    call void @putint(i32 %temp18)
+    ret i32 0
+}
+

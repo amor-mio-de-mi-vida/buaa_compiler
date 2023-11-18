@@ -1,0 +1,9 @@
+int a[3+3]={1,2,3,4,5,6};
+int a2(int x,int y[]){
+    return x+y[2];
+}
+int main(){
+    int x=a2(a[4],a);
+    printf("%d",x);
+    return 0;
+}

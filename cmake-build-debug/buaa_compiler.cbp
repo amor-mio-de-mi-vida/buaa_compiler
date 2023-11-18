@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="buaa_compiler"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="hw3">
+				<Option output="/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/hw3" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/15.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 hw3"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="hw3/fast">
+				<Option output="/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/hw3" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/15.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 hw3/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/error.cpp">
+			<Option target="hw3"/>
+		</Unit>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/error.h">
+			<Option target="hw3"/>
+		</Unit>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/generate_ir.cpp">
+			<Option target="hw3"/>
+		</Unit>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/generate_ir.h">
+			<Option target="hw3"/>
+		</Unit>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/lexer.cpp">
+			<Option target="hw3"/>
+		</Unit>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/lexer.h">
+			<Option target="hw3"/>
+		</Unit>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/llvm_ir.cpp">
+			<Option target="hw3"/>
+		</Unit>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/llvm_ir.h">
+			<Option target="hw3"/>
+		</Unit>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/main.cpp">
+			<Option target="hw3"/>
+		</Unit>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/parser.cpp">
+			<Option target="hw3"/>
+		</Unit>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/parser.h">
+			<Option target="hw3"/>
+		</Unit>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/utils.cpp">
+			<Option target="hw3"/>
+		</Unit>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/utils.h">
+			<Option target="hw3"/>
+		</Unit>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

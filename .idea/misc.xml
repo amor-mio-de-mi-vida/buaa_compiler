@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeWorkspace" PROJECT_DIR="$PROJECT_DIR$" />
+  <component name="CidrRootsConfiguration">
+    <excludeRoots>
+      <file path="$PROJECT_DIR$/2023代码生成辅助库" />
+      <file path="$PROJECT_DIR$/2023错误处理辅助库" />
+      <file path="$PROJECT_DIR$/混合辅助测试库" />
+    </excludeRoots>
+  </component>
+</project>
