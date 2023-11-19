@@ -53,6 +53,8 @@ Register generateEqExp();
 Register generateRelExp();
 void generateForstmt();
 void generateForStmt();
+void generateBreakStmt();
+void generateContinueStmt();
 
 void skipOr();
 void skipAnd();

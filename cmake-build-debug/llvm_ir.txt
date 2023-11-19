@@ -3,28 +3,91 @@ declare void @putint(i32)      ; 输出一个整数
 declare void @putch(i32)       ; 输出一个字符
 declare void @putstr(i8*)      ; 输出字符串
 
-@a = dso_local global [6 x i32] [i32 1, i32 2, i32 3, i32 4, i32 5, i32 6]
-define dso_local i32 @a2(i32 %temp5, i32* %temp6) {
-    %temp4 = alloca i32*
-    store i32* %temp6, i32** %temp4
-    %temp3 = alloca i32
-    store i32 %temp5, i32* %temp3
-    %temp7 = load i32, i32* %temp3
-    %temp9 = getelementptr i32, i32* %temp4, i32 0, i32 2
-    %temp8 = load i32, i32* %temp9
-    %temp10 = add i32 %temp7, %temp8
-    ret i32 %temp10
-}
-
 define dso_local i32 @main() {
-    %temp12 = alloca i32
-    %temp14 = getelementptr i32, i32* @a, i32 0, i32 4
-    %temp13 = load i32, i32* %temp14
-    %temp16 = getelementptr [6 x i32], [6 x i32]* @a, i32 0, i32 0
-    %temp17 = call i32 @a2(i32 %temp13, i32* %temp16)
-    store i32 %temp17, i32* %temp12
-    %temp18 = load i32, i32* %temp12
-    call void @putint(i32 %temp18)
+    %temp1 = alloca i32
+    store i32 1, i32* %temp1
+    %temp2 = alloca i32
+    %temp4 = load i32, i32* %temp2
+    %temp5 = load i32, i32* %temp1
+    store i32 %temp5, i32* %temp2
+    %temp6 = alloca i32
+    %temp7 = alloca i32
+    %temp8 = alloca i32
+    %temp10 = load i32, i32* %temp7
+    %temp11 = call i32 @getint()
+    store i32 %temp11, i32* %temp7
+    %temp16 = load i32, i32* %temp8
+    %temp17 = load i32, i32* %temp1
+    %temp18 = load i32, i32* %temp1
+    %temp19 = mul i32 %temp17, %temp18
+    store i32 %temp19, i32* %temp8
+    br label %temp12
+
+temp12:
+    %temp20 = load i32, i32* %temp8
+    %temp21 = load i32, i32* %temp7
+    %temp22 = add i32 %temp21, 1
+    %temp23 = icmp slt i32 %temp20, %temp22
+    br i1 %temp23, label %temp14, label %temp15
+
+temp13:
+    %temp24 = load i32, i32* %temp8
+    %temp25 = load i32, i32* %temp8
+    %temp26 = add i32 %temp25, 1
+    store i32 %temp26, i32* %temp8
+    br label %temp12
+
+temp14:
+    %temp28 = load i32, i32* %temp6
+    %temp29 = load i32, i32* %temp2
+    store i32 %temp29, i32* %temp6
+    %temp31 = load i32, i32* %temp2
+    %temp32 = load i32, i32* %temp1
+    %temp33 = load i32, i32* %temp2
+    %temp34 = add i32 %temp32, %temp33
+    store i32 %temp34, i32* %temp2
+    %temp36 = load i32, i32* %temp1
+    %temp37 = load i32, i32* %temp6
+    store i32 %temp37, i32* %temp1
+    %temp40 = load i32, i32* %temp8
+    %temp42 = sdiv i32 %temp40, 2
+    %temp43 = mul i32 %temp42, 2
+    %temp41 = sub i32 %temp40, %temp43
+    %temp44 = icmp eq i32 %temp41, 1
+    br i1 %temp44, label %temp38, label %temp39
+
+temp38:
+    br label %temp13
+
+    br label %temp39
+
+temp39:
+    %temp45 = load i32, i32* %temp8
+    %temp46 = load i32, i32* %temp1
+    call void @putch(i32 114)
+    call void @putch(i32 111)
+    call void @putch(i32 117)
+    call void @putch(i32 110)
+    call void @putch(i32 100)
+    call void @putch(i32 32)
+    call void @putint(i32 %temp45)
+    call void @putch(i32 58)
+    call void @putch(i32 32)
+    call void @putint(i32 %temp46)
+    call void @putch(i32 10)
+    %temp49 = load i32, i32* %temp8
+    %temp50 = icmp sgt i32 %temp49, 19
+    br i1 %temp50, label %temp47, label %temp48
+
+temp47:
+    br label %temp15
+
+    br label %temp48
+
+temp48:
+    br label %temp13
+
+temp15:
     ret i32 0
 }
 

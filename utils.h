@@ -128,10 +128,11 @@ bool isGlobalDecl();
 void pushRegister(const string& name, const Register& result);
 string typeToString(const Type& type);
 int stringToType(const string& str);
-void searchGlobalRegister(int id, int value);
+void searchFuncReturn(int id, int value);
 Register searchRegister(const string& name);
 void pushGlobalRegister(const string& name, const Register& result);
 bool isGlobalVar(const string& name);
+bool isGlobalRegister(const string& name);
 
 
 #endif //BUAA_COMPILER_UTILS_H

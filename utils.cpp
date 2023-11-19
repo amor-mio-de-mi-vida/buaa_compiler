@@ -37,7 +37,7 @@ string typeToString(const Type& type) {
         if (type.boundary.size() == 2) {
             return "[" + to_string(type.boundary.at(0)) + " x [" + to_string(type.boundary.at(1)) + " x i32]]";
         } else if (type.boundary.size() == 1) {
-            return "[" + to_string(type.boundary.at(0)) + " x i32*";
+            return "[" + to_string(type.boundary.at(0)) + " x i32]*";
         } else if (type.boundary.empty()) {
             return "int32**";
         }
@@ -202,7 +202,15 @@ void pushGlobalRegister(const string& name, const Register& result) {
     registerTableList.at(0).directory.insert(make_pair(name, result));
 }
 
-void searchGlobalRegister(int id, int value) {
+bool isGlobalRegister(const string& name) {
+    auto iter = registerTableList.at(0).directory.find(name);
+    if (iter != registerTableList.at(0).directory.end()) {
+        return true;
+    }
+    return false;
+}
+
+void searchFuncReturn(int id, int value) {
     auto iter = registerTableList.at(0).directory.begin();
     for (; iter != registerTableList.at(0).directory.end(); iter++) {
         if (iter->second.id == id) {

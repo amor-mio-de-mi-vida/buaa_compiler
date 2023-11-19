@@ -5,6 +5,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "llvm_ir.h"
+#include "utils.h"
 #include "generate_ir.h"
 #include <cassert>
 
@@ -19,6 +20,8 @@ extern unordered_map<int, Register> registerList;
 extern unordered_map<string, Register> globalFuncList;
 extern unordered_map<int, RegisterTable> registerTableList;
 int currentFunc = 0;
+vector<string> currentStmtEnd;
+vector<string> currentForEnd;
 
 Register getNewRegister(int num) {
     return *new Register(num);
@@ -195,9 +198,9 @@ void generateStmt() {
     } else if (isToken("FORTK", false, false, __FUNCTION__)) {
         generateForstmt();
     } else if (isToken("BREAKTK",false, false, __FUNCTION__)) {
-//        generateBreakStmt();
+        generateBreakStmt();
     } else if (isToken("CONTINUETK", false, false, __FUNCTION__)) {
-//        generateContinueStmt();
+        generateContinueStmt();
     } else if (isToken("RETURNTK", false, false, __FUNCTION__)) {
         generateReturnStmt();
     } else if (isToken("PRINTFTK", false, false, __FUNCTION__)) {
@@ -242,7 +245,7 @@ void generateReturnStmt() {
             if (preReadExp()) {
                 result = generateExp();
                 if (result.hasValue) {
-                    searchGlobalRegister(currentFunc, result.value);
+                    searchFuncReturn(currentFunc, result.value);
                 }
             }
             if (isToken("SEMICN", true, true, __FUNCTION__)) {
@@ -558,6 +561,7 @@ Register generateLVal(bool left) {
     Register result = getNewRegister(false, 0, false, false, type.id, type.dim);
     std::string name = parseIdent();
     basePtr = searchRegister(name);
+    bool isGlobal = isGlobalRegister(name);
 
     vector<int> info;
 
@@ -571,19 +575,39 @@ Register generateLVal(bool left) {
     }
 
     if (info.empty()) {
-        ptr = printllvmGetElementPtr(basePtr);
         if (basePtr.type.dim == 0) {
+            loadRegister(basePtr, result);
+            basePtr.name = result.name;
+            ptr = basePtr;
+        } else {
+            ptr = printllvmGetElementPtr(basePtr);
+        }
+    } else if (info.size() == 1) {
+        Register mid = Register(0);
+        if (!isGlobal && basePtr.type.dim != basePtr.type.boundary.size()) {
+            mid = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim);
+            mid.type.boundary = basePtr.type.boundary;
+            loadRegister(basePtr, mid);
+            basePtr = mid;
+        }
+        ptr = printllvmGetElementPtr(basePtr, info.at(0));
+        if (ptr.type.dim == 0) {
             loadRegister(ptr, result);
             ptr.name = result.name;
         }
-    } else if (info.size() == 1) {
-        ptr = printllvmGetElementPtr(basePtr, info.at(0));
-        loadRegister(ptr, result);
-        ptr.name = result.name;
     } else if (info.size() == 2) {
+        Register mid = Register(0);
+        if (!isGlobal && basePtr.type.dim != basePtr.type.boundary.size()) {
+            mid = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim);
+            mid.type.boundary = basePtr.type.boundary;
+            loadRegister(basePtr, mid);
+            basePtr = mid;
+        }
         ptr = printllvmGetElementPtr(basePtr, info.at(0), info.at(1));
-        loadRegister(ptr, result);
-        ptr.name = result.name;
+        if (ptr.type.dim == 0) {
+            loadRegister(ptr, result);
+            ptr.name = result.name;
+        }
     }
 
     return ptr;
@@ -1034,6 +1058,8 @@ void generateForstmt() {
     Register stmt_begin = getNewRegister(false, 0, false, false, -2, 0);
     Register for_end = getNewRegister(false, 0, false, false, -2, 0);
     Register cond = Register(0);
+    currentStmtEnd.push_back(stmt_end.name);
+    currentForEnd.push_back(for_end.name);
 
     if (isToken("FORTK", true, true, __FUNCTION__)) {
         if (isToken("LPARENT", true, true, __FUNCTION__)) {
@@ -1093,6 +1119,8 @@ void generateForstmt() {
     } else {
         assert(0);
     }
+    currentStmtEnd.pop_back();
+    currentForEnd.pop_back();
 }
 
 void generateForStmt() {
@@ -1106,3 +1134,26 @@ void generateForStmt() {
     storeRegister(ptr, result);
 }
 
+void generateBreakStmt() {
+    if (isToken("BREAKTK", true, true, __FUNCTION__)) {
+        if (isToken("SEMICN", true, true, __FUNCTION__)) {
+            printllvmBranch(currentForEnd.back());
+        } else {
+            assert(0);
+        }
+    } else {
+        assert(0);
+    }
+}
+
+void generateContinueStmt() {
+    if (isToken("CONTINUETK", true, true, __FUNCTION__)) {
+        if (isToken("SEMICN", true, true, __FUNCTION__)) {
+            printllvmBranch(currentStmtEnd.back());
+        } else {
+            assert(0);
+        }
+    } else {
+        assert(0);
+    }
+}

@@ -27,6 +27,7 @@ void printllvmCallFunc(Register& result, const string& name, const vector<Regist
 Register printllvmGetElementPtr(const Register& basePtr);
 Register printllvmGetElementPtr(const Register& basePtr, int i);
 Register printllvmGetElementPtr(const Register& basePtr, int i, int j);
+void printllvmBranch(const string& name);
 void printllvmBranch(const Register& label);
 void printllvmBranch(const Register& cond, const Register& stmt1, const Register& stmt2);
 void printllvmLabel(const Register& label);
