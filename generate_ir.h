@@ -25,13 +25,13 @@ void printllvmPrintfStmt(const string& str, const vector<Register>& params);
 vector<Register> generateFuncFParams();
 void printllvmCallFunc(Register& result, const string& name, const vector<Register>& params);
 Register printllvmGetElementPtr(const Register& basePtr);
-Register printllvmGetElementPtr(const Register& basePtr, int i);
-Register printllvmGetElementPtr(const Register& basePtr, int i, int j);
+Register printllvmGetElementPtr(const Register& basePtr, const Register& value_i);
+Register printllvmGetElementPtr(const Register& basePtr, const Register& value_i, const Register& value_j);
 void printllvmBranch(const string& name);
 void printllvmBranch(const Register& label);
 void printllvmBranch(const Register& cond, const Register& stmt1, const Register& stmt2);
 void printllvmLabel(const Register& label);
-Register printllvmTruncCond(const Register& cond);
-Register printllvmZext(const Register& right);
+// Register printllvmTruncCond(const Register& cond);
+Register printllvmZext(Register& right);
 
 #endif //BUAA_COMPILER_GENERATE_IR_H

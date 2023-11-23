@@ -11,9 +11,11 @@
 extern bool parser;
 extern bool error;
 extern std::vector<Token>::iterator iter;
+extern bool ir;
 extern std::vector<Token> TokenList;
 extern ofstream fout;
 int isCircle = 0; // 错误处理判断是否在解析循环块
+int currentFuncReturnType;
 
 bool preReadExp() {
     if (isToken("PLUS", false,false,__FUNCTION__) || isToken("MINU", false,false,__FUNCTION__) || isToken("NOT", false,false,__FUNCTION__)
@@ -45,15 +47,18 @@ void parseCompUnit() {
 
     while (isToken("VOIDTK",false, false, __FUNCTION__) || isToken("CONSTTK",false, false, __FUNCTION__) || isToken("INTTK",false, false, __FUNCTION__)) {
         if (isToken("VOIDTK", false, false, __FUNCTION__)) {
+            currentFuncReturnType = 0;
             parseFuncDef();
         }
         else if (isToken("CONSTTK", false, false,__FUNCTION__)) {
             parseDecl();
         } else if (isToken("INTTK", false, false,__FUNCTION__)) {
             if (preReadToken(1)!= nullptr && preReadToken(1)->getType() == "MAINTK") {
+                currentFuncReturnType = 1;
                 parseMainFuncDef();
             } else if (preReadToken(1)!= nullptr && preReadToken(1)->getType() == "IDENFR") {
                 if (preReadToken(2)!= nullptr && preReadToken(2)->getType() == "LPARENT") {
+                    currentFuncReturnType = 1;
                     parseFuncDef();
                 } else if (preReadToken(2)!= nullptr && (preReadToken(2)->getType() == "LBRACK"
                         || preReadToken(2)->getType() == "SEMICN" || preReadToken(2)->getType() == "COMMA"
@@ -339,6 +344,7 @@ int parseFuncFParam() {
 }
 
 void parseBlock() {
+    bool flag = false;
     if (isToken("LBRACE", true, true, __FUNCTION__)) {
         while (!isToken("RBRACE", true, false, __FUNCTION__)) {
             parseBlockItem();
@@ -832,4 +838,27 @@ int parseFuncCall() {
         assert(0);
     }
     return type;
+}
+
+bool isLastStmt() {
+    bool mode1 = ir;
+    bool mode2 = error;
+    auto iter0 = iter;
+    ir = false;
+    error = false;
+
+    while (!isToken("RBRACE", true, false, __FUNCTION__)) {
+        if (isToken("CONSTTK", false, false, __FUNCTION__) || isToken("INTTK", false, false, __FUNCTION__)) {
+            parseDecl();
+        } else {
+            ir = mode1;
+            error = mode2;
+            iter = iter0;
+            return false;
+        }
+    }
+    ir = mode1;
+    error = mode2;
+    iter = iter0;
+    return true;
 }

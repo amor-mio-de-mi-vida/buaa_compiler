@@ -19,7 +19,9 @@ extern std::vector<Token> TokenList;
 extern unordered_map<int, Register> registerList;
 extern unordered_map<string, Register> globalFuncList;
 extern unordered_map<int, RegisterTable> registerTableList;
-int currentFunc = 0;
+extern int currentFuncReturnType;
+bool Return = false;
+bool globalDeclare = true;
 vector<string> currentStmtEnd;
 vector<string> currentForEnd;
 
@@ -55,7 +57,7 @@ Register allocRegister(const Type& type) {
     Register ptr = Register(0);
     ptr = getNewRegister(false, 0, false, false, type.id, type.dim);
     ptr.type.boundary = type.boundary;
-    string str = "    "+ ptr.name + " = alloca " + typeToString(type) + "\n";
+    string str = "    "+ ptr.name + " = alloca " + type.to_str() + "\n";
     printllvm(str);
     return ptr;
 }
@@ -89,7 +91,7 @@ void storeRegister(const Register& ptr, const Register& value) {  // ptr是基�
     if (ptr.type.dim == 2 && ptr.type.boundary.size() == 1) {
         str = "    store [" + to_string(ptr.type.boundary.at(0)) +  " x i32]* " + value.name + ", [" + to_string(ptr.type.boundary.at(0)) + " x i32]* * " + ptr.name + "\n";
     } else {
-        str = "    store " + typeToString(value.type) + " " + value.name + ", " + typeToString(ptr.type) + "* " +
+        str = "    store " + value.type.to_str() + " " + value.name + ", " + ptr.type.to_str() + "* " +
                      ptr.addr + "\n";
     }
     printllvm(str);
@@ -98,8 +100,8 @@ void storeRegister(const Register& ptr, const Register& value) {  // ptr是基�
 void loadRegister(const Register& ptr, Register& result) {
     string str;
     if (!(ptr.id==0 && ptr.name == "-1")) {
-        str = "    " + result.name + " = load " + typeToString(result.type) + ", " +
-                     typeToString(ptr.type) + "* " + ptr.addr + "\n";
+        str = "    " + result.name + " = load " + result.type.to_str() + ", " +
+                     ptr.type.to_str() + "* " + ptr.addr + "\n";
     }
     printllvm(str);
 }
@@ -111,16 +113,22 @@ void generateCompUnit() {
     pushRegisterTable();
     while (isToken("VOIDTK",false, false, __FUNCTION__) || isToken("CONSTTK",false, false, __FUNCTION__) || isToken("INTTK",false, false, __FUNCTION__)) {
         if (isToken("VOIDTK", false, false, __FUNCTION__)) {
+            currentFuncReturnType = 0;
             generateFuncDef();
+            globalDeclare = true;
         }
         else if (isToken("CONSTTK", false, false,__FUNCTION__)) {
             generateDecl();
         } else if (isToken("INTTK", false, false,__FUNCTION__)) {
             if (preReadToken(1)!= nullptr && preReadToken(1)->getType() == "MAINTK") {
+                currentFuncReturnType = 1;
                 generateMainFuncDef();
+                globalDeclare = true;
             } else if (preReadToken(1)!= nullptr && preReadToken(1)->getType() == "IDENFR") {
                 if (preReadToken(2)!= nullptr && preReadToken(2)->getType() == "LPARENT") {
+                    currentFuncReturnType = 1;
                     generateFuncDef();
+                    globalDeclare = true;
                 } else if (preReadToken(2)!= nullptr && (preReadToken(2)->getType() == "LBRACK"
                                                          || preReadToken(2)->getType() == "SEMICN" || preReadToken(2)->getType() == "COMMA"
                                                          || preReadToken(2)->getType() == "ASSIGN")) {
@@ -136,7 +144,7 @@ void generateCompUnit() {
     if (iter != TokenList.end()) {
         assert(0);
     }
-    popSymbolTable();
+    popRegisterTable();
 
 }
 
@@ -145,14 +153,14 @@ void generateMainFuncDef() {
     vector<Register> params;
     Register global = *new Register(registers++, "" ,"@main", 0, false, 0, 0, true, true);
     pushRegister("main", global);
-    currentFunc = global.id;
     if (isToken("INTTK", true, true, __FUNCTION__)) {
         if (isToken("MAINTK", true, true, __FUNCTION__)) {
             if (isToken("LPARENT", true, true, __FUNCTION__)) {
                 if (isToken("RPARENT", true, true, __FUNCTION__)) {
                     printllvmFuncDef(1, "main", params);
                     pushRegisterTable();
-                    generateBlock();
+                    globalDeclare = false;
+                    generateBlock(true);
                     popRegisterTable();
                 } else {
                     assert(0);
@@ -170,10 +178,13 @@ void generateMainFuncDef() {
     printllvm("}\n\n");
 }
 
-void generateBlock() {
+void generateBlock(bool funcBlock) {
     if (isToken("LBRACE", true, true, __FUNCTION__)) {
         while (!isToken("RBRACE", true, false, __FUNCTION__)) {
             generateBlockItem();
+            if (funcBlock && isLastStmt() && iter->getType() != "RETURNTK" && currentFuncReturnType == 0) {
+                printllvm("    ret void\n");
+            }
         }
     } else {
         assert(0);
@@ -236,6 +247,7 @@ void generateStmt() {
 }
 
 void generateReturnStmt() {
+    Return = true;
     Register result = Register(0);
     Register func = Register(0);
     if (isToken("RETURNTK", true, true, __FUNCTION__)) {
@@ -244,9 +256,6 @@ void generateReturnStmt() {
         } else {
             if (preReadExp()) {
                 result = generateExp();
-                if (result.hasValue) {
-                    searchFuncReturn(currentFunc, result.value);
-                }
             }
             if (isToken("SEMICN", true, true, __FUNCTION__)) {
             } else {
@@ -268,43 +277,59 @@ Register generateExp() {
 Register generateAddExp() {
     Type type = Type(0,0);
     Register left = generateMulExp();
-    Register result = Register(0);
 
-    if (isToken("PLUS", true, false, __FUNCTION__)) {
-        Register right = generateAddExp();
-        result = getNewRegister(false,0,false, false, type.id, type.dim);
-        printllvmcalculate(result, left, right, "PLUS");
-        return result;
-    } else if (isToken("MINU", true, false, __FUNCTION__)) {
-        Register right = generateAddExp();
-        result = getNewRegister(false,0,false, false, type.id, type.dim);
-        printllvmcalculate(result, left, right, "MINU");
-        return result;
+    while (preReadToken(1)!=nullptr && (isToken("PLUS", true, false, __FUNCTION__) || isToken("MINU", true, false, __FUNCTION__))) {
+        string op = (iter - 1)->getType();
+        Register right = generateMulExp();
+        Register result = getNewRegister(false, 0, false, false, type.id, type.dim);
+        printllvmcalculate(result, left, right, op);
+        left = result;
     }
+
+//    if (isToken("PLUS", true, false, __FUNCTION__)) {
+//        Register right = generateAddExp();
+//        result = getNewRegister(false,0,false, false, type.id, type.dim);
+//        printllvmcalculate(result, left, right, "PLUS");
+//        return result;
+//    } else if (isToken("MINU", true, false, __FUNCTION__)) {
+//        Register right = generateAddExp();
+//        result = getNewRegister(false,0,false, false, type.id, type.dim);
+//        printllvmcalculate(result, left, right, "MINU");
+//        return result;
+//    }
+
     return left;
 }
 
 Register generateMulExp() {
     Type type = Type(0,0);
     Register left = generateUnaryExp();
-    Register result = Register(0);
 
-    if(isToken("MULT", true, false, __FUNCTION__ )) {
-        Register right = generateMulExp();
-        result = getNewRegister(false,0,false, false, type.id, type.dim);
-        printllvmcalculate(result, left, right, "MULT");
-        return result;
-    } else if (isToken("DIV", true, false, __FUNCTION__ )) {
-        Register right = generateMulExp();
-        result = getNewRegister(false,0,false, false, type.id, type.dim);
-        printllvmcalculate(result, left, right, "DIV");
-        return result;
-    } else if (isToken("MOD", true, false, __FUNCTION__ )) {
-        Register right = generateMulExp();
-        result = getNewRegister(false,0,false, false, type.id, type.dim);
-        printllvmcalculate(result, left, right, "MOD");
-        return result;
+    while (preReadToken(1) != nullptr && (isToken("MULT", true, false, __FUNCTION__ )
+    || isToken("DIV", true, false, __FUNCTION__ ) || isToken("MOD", true, false, __FUNCTION__ ))) {
+        string op = (iter - 1)->getType();
+        Register right = generateUnaryExp();
+        Register result = getNewRegister(false, 0, false, false, type.id, type.dim);
+        printllvmcalculate(result, left, right, op);
+        left = result;
     }
+
+//    if(isToken("MULT", true, false, __FUNCTION__ )) {
+//        Register right = generateMulExp();
+//        result = getNewRegister(false,0,false, false, type.id, type.dim);
+//        printllvmcalculate(result, left, right, "MULT");
+//        return result;
+//    } else if (isToken("DIV", true, false, __FUNCTION__ )) {
+//        Register right = generateMulExp();
+//        result = getNewRegister(false,0,false, false, type.id, type.dim);
+//        printllvmcalculate(result, left, right, "DIV");
+//        return result;
+//    } else if (isToken("MOD", true, false, __FUNCTION__ )) {
+//        Register right = generateMulExp();
+//        result = getNewRegister(false,0,false, false, type.id, type.dim);
+//        printllvmcalculate(result, left, right, "MOD");
+//        return result;
+//    }
     return left;
 }
 
@@ -318,12 +343,18 @@ Register generateUnaryExp() {
         if (isToken("MINU", true, false, __FUNCTION__)) {
             Register temp = generateUnaryExp();
             result = getNewRegister(false, 0, false, false, type.id, type.dim);
-            printllvmcalculate(result, getNewRegister(true, 0, false, true, type.id, type.dim), temp, "MINU");
+            printllvmcalculate(result, Register(0), temp, "MINU");
         }
         if (isToken("NOT", true, false, __FUNCTION__)) {
-            Register temp = generateUnaryExp();
-            result = getNewRegister(false, 0, false, true, type.id, type.dim);
-            printllvmCompare(result, Register(0), temp, "NOT");
+            Register temp_i32 = generateUnaryExp(); // temp是i32类型的
+            Register temp_i1 = getNewRegister(false, 0, false,false, -2, 0);
+            printllvmCompare(temp_i1, temp_i32, Register(0), "NEQ");
+            temp_i32 = printllvmZext(temp_i1);
+            result = getNewRegister(false, 0, false, true, -2, type.dim);
+            printllvmCompare(result, Register(1), temp_i32, "NOT");
+            if (result.type.id == -2) {
+                result = printllvmZext(result);
+            }
         }
     } else if (isToken("IDENFR", false, false, __FUNCTION__)) {
         if (preReadToken(1) != nullptr && preReadToken(1)->getType() == "LPARENT") {
@@ -340,7 +371,7 @@ Register generateUnaryExp() {
 Register generatePrimaryExp() {
     Register result = Register(0);
     if(isToken("LPARENT", true, false, __FUNCTION__)) {
-        generateExp();
+        result = generateExp();
         if (isToken("RPARENT", true, true, __FUNCTION__)) {
         } else {
             assert(0);
@@ -429,9 +460,15 @@ void generateConstDef(int type_id) {
         pushRegister(name, ptr);
         storeInitial(ptr, value);
     } else {
-        printllvmGlobalAssign(name, type, value);
-        if (type.dim == 0) {
-            Register global = *new Register(registers++, "" ,"@"+name, value.at(0).value, true, type.id, type.dim, true, true);
+        if (!value.empty()) {
+            printllvmGlobalAssign(name, type, value);
+            Register global = *new Register(registers++, "", "@"+name, value.at(0).value, true, type.id, type.dim, true, true);
+            global.type.boundary = type.boundary;
+            pushRegister(name, global);
+        } else {
+            printllvm("zeroinitializer\n");
+            Register global = *new Register(registers++, "", "@"+name, 0, true, type.id, type.dim, true, true);
+            global.type.boundary = type.boundary;
             pushRegister(name, global);
         }
     }
@@ -563,11 +600,11 @@ Register generateLVal(bool left) {
     basePtr = searchRegister(name);
     bool isGlobal = isGlobalRegister(name);
 
-    vector<int> info;
+    vector<Register> info;
 
     while(isToken("LBRACK", true, false, __FUNCTION__)) {
         Register index = generateExp();
-        info.push_back(index.value);
+        info.push_back(index);
         if (isToken("RBRACK", true, true, __FUNCTION__)) {
         } else {
             assert(0);
@@ -576,11 +613,16 @@ Register generateLVal(bool left) {
 
     if (info.empty()) {
         if (basePtr.type.dim == 0) {
-            loadRegister(basePtr, result);
-            basePtr.name = result.name;
-            ptr = basePtr;
+            if (!globalDeclare) {
+                loadRegister(basePtr, result);
+                basePtr.name = result.name;
+            }
+            return basePtr;
         } else {
             ptr = printllvmGetElementPtr(basePtr);
+            if (basePtr.type.dim == 2 && basePtr.type.boundary.size() == 1) {
+                ptr.type.boundary = basePtr.type.boundary;
+            }
         }
     } else if (info.size() == 1) {
         Register mid = Register(0);
@@ -615,7 +657,7 @@ Register generateLVal(bool left) {
 
 void generateBlockStmt() {
     pushRegisterTable();
-    generateBlock();
+    generateBlock(false);
     popRegisterTable();
 }
 
@@ -685,13 +727,13 @@ void generateFuncDef() {
 
     Register global = *new Register(registers++, "" ,"@"+funcname, 0, false, stringToType(func_retype) - 1, 0, true, true);
     pushRegister(funcname, global);
-    currentFunc = global.id;
 
     pushRegisterTable();
     if (isToken("LPARENT", true, true, __FUNCTION__)) {
         if (isToken("RPARENT", true, false, __FUNCTION__)) {
             printllvmFuncDef(stringToType(func_retype), funcname, params);
-            generateBlock();
+            globalDeclare = false;
+            generateBlock(true);
         } else {
             if (isToken("INTTK", false, false, __FUNCTION__)) {
                 params = generateFuncFParams();
@@ -701,11 +743,17 @@ void generateFuncDef() {
                 assert(0);
             }
             printllvmFuncDef(stringToType(func_retype), funcname, params);
-            generateBlock();
+            globalDeclare = false;
+            generateBlock(true);
         }
     } else {
         assert(0);
     }
+
+    if (!Return) {
+        printllvm("    ret void\n");
+    }
+    Return = false;
     popRegisterTable();
     printllvm("}\n\n");
 }
@@ -781,6 +829,7 @@ void generateAssignStmt() {
     }
 
     storeRegister(ptr, result);
+    assignRegister(ptr, result);
 }
 
 vector<Register> generateFuncRParams() {
@@ -820,59 +869,36 @@ Register generateFuncCall() {
 }
 
 void generateIfStmt() {
-    Register if_begin = getNewRegister(false, 0, false, false, -2, 0);
-    Register if_end = getNewRegister(false, 0, false, false, -2, 0);
+    Register if_begin = getNewRegister(false, 0, false, false, -3, 0);
+    Register if_end = getNewRegister(false, 0, false, false, -3, 0);
     Register else_end = Register(if_end);
-    Register cond = Register(0);
-    int conditionTrue = -1;
-    bool mod = ir;
+
 
     if (isToken("IFTK", true, true, __FUNCTION__)) {
         if (isToken("LPARENT", true, true, __FUNCTION__)) {
-            cond = generateCond();
 
-            if (cond.hasValue) {
-                conditionTrue = cond.value;
-            } else {
-                if (cond.type.id != -2)
-                    cond = printllvmTruncCond(cond);
-            }
-
-            if (conditionTrue == -1) {
-                printllvmBranch(cond, if_begin, if_end);
-                printllvmLabel(if_begin);
-            }
+            generateCond(if_begin, if_end);
+            printllvmLabel(if_begin);
 
             if (isToken("RPARENT", true, true, __FUNCTION__)) {
-                if (conditionTrue == 0) {
-                    ir = false;
-                }
+
                 generateStmt();
-                ir = mod;
+
 
                 if (isToken("ELSETK", true, false, __FUNCTION__)) {
-                    else_end = getNewRegister(false, 0, false, false, -2, 0);
+                    else_end = getNewRegister(false, 0, false, false, -3, 0);
 
-                    if (conditionTrue == -1) {
-                        printllvmBranch(cond, else_end, if_end);
-                        printllvmLabel(if_end);
-                    }
+                    printllvmBranch(else_end);
+                    printllvmLabel(if_end);
 
-                    if (conditionTrue == 1) {
-                        ir = false;
-                    }
                     generateStmt();
-                    ir = mod;
 
-                    if (conditionTrue == -1) {
-                        printllvmBranch(else_end);
-                        printllvmLabel(else_end);
-                    }
+                    printllvmBranch(else_end);
+                    printllvmLabel(else_end);
+
                 } else {
-                    if (conditionTrue == -1) {
-                        printllvmBranch(if_end);
-                        printllvmLabel(if_end);
-                    }
+                    printllvmBranch(if_end);
+                    printllvmLabel(if_end);
                 }
             } else {
                 assert(0);
@@ -885,93 +911,98 @@ void generateIfStmt() {
     }
 }
 
-Register generateCond() {
-    return generateLOrExp();
+void generateCond(const Register& true_label, const Register& false_label) {
+    generateLOrExp(true_label, false_label);
 }
 
-Register generateLOrExp() {
+void generateLOrExp(const Register& true_label, const Register& false_label) {
     Type type = Type(0, 0);
-    Register left = generateLAndExp();
-    Register right = Register(0);
+    Register next_or_label = Register(0);
+    if (!isLastLAndExp()) {
+        next_or_label = getNewRegister(false, 0, false, false, -3, 0);
+    } else {
+        next_or_label = false_label;
+    }
+    Register left_i1 = generateLAndExp(true_label, next_or_label);
+    Register right_i1 = Register(0);
     Register result = Register(0);
 
-    if (left.hasValue && left.value == 1) {
-        skipOr();
-        left.name = "1";
-        return left;
+    if (!isLastLAndExp()) {
+        // printllvmBranch(left_i1, true_label, false_label);
+        printllvmLabel(next_or_label);
     }
 
     if (isToken("OR", false, false, __FUNCTION__)) {
         while ((isToken("OR", true, false, __FUNCTION__))) {
-            right = generateLAndExp();
-            if (!left.hasValue) {
-                result = getNewRegister(false, 0, false, false, type.id, type.dim);
-                if (right.type.id == -2) {
-                    right = printllvmZext(right);
-                }
-                printllvmcalculate(result, left, right, "OR");
+            bool flag = !isLastLAndExp();
+            Register next_or_label0 = Register(0);
+            if (flag) {
+                next_or_label0 = getNewRegister(false, 0, false, false, -3, 0);
             } else {
-                result = right;
+                next_or_label0 = false_label;
             }
-            if (result.hasValue && result.value == 1) {
-                skipOr();
-                return *new Register(1);
+
+            right_i1 = generateLAndExp(true_label, next_or_label0);
+            result = getNewRegister(false, 0, false, false, -2, 0);
+            printllvmcalculate(result, left_i1, right_i1, "OR");
+
+            printllvmBranch(result, true_label, next_or_label0);
+            if (flag) {
+                printllvmLabel(next_or_label0);
             }
-            left = result;
+            left_i1 = result;
         }
-        if (result.hasValue) {
-            return *new Register(0);
-        } else {
-            return result;
-        }
-    } else {
-        if (left.hasValue && left.value != 0) {
-            left.value = 1;
-        }
-        return left;
     }
 }
 
-Register generateLAndExp() {
+Register generateLAndExp(const Register& true_label,  const Register& false_label) {
     Type type = Type(0, 0);
-    Register left = generateEqExp();
-    Register right = Register(0);
+    Register next_and_label = Register(0);
+    if (!isLastEqExp()) {
+        next_and_label = getNewRegister(false, 0, false,false, -3, 0);
+    } else {
+        next_and_label = true_label;
+    }
+    Register left_i32 = generateEqExp(); // 要求返回的数据类型为i32
+    Register right_i32 = Register(0);
     Register result = Register(0);
 
-    if (left.hasValue && left.value == 0) {
-        skipAnd();
-        left.name = "0";
-        return left;
+    Register left_i1 = getNewRegister(false, 0, false, false, -2, 0);
+    printllvmCompare(left_i1, left_i32, Register(0), "NEQ");
+
+    printllvmBranch(left_i1, next_and_label, false_label);
+    if (!isLastEqExp()) {
+        printllvmLabel(next_and_label);
     }
+
+
+    Register right_i1 = Register(0);
 
     if (isToken("AND", false, false, __FUNCTION__)) {
         while ((isToken("AND", true, false, __FUNCTION__))) {
-            right = generateEqExp();
-            if (!left.hasValue) {
-                result = getNewRegister(false, 0, false, false, type.id, type.dim);
-                if (right.type.id == -2) {
-                    right = printllvmZext(right);
-                }
-                printllvmcalculate(result, left, right, "AND");
+            bool flag = !isLastEqExp();
+            Register next_and_label0 = Register(0);
+            if (flag) {
+                next_and_label0 = getNewRegister(false, 0, false, false, -3, 0);
             } else {
-                result = right;
+                next_and_label0 = true_label;
             }
-            if (result.hasValue && result.value == 0) {
-                skipAnd();
-                return *new Register(0);
+            right_i32 = generateEqExp();
+            right_i1 = getNewRegister(false, 0, false, false, -2, 0);
+            printllvmCompare(right_i1, right_i32, Register(0), "NEQ");
+
+            result = getNewRegister(false, 0, false, false, -2, 0);
+            printllvmcalculate(result, left_i1, right_i1, "AND");
+
+            printllvmBranch(result, next_and_label0, false_label);
+            if (flag) {
+                printllvmLabel(next_and_label0);
             }
-            left = result;
+            left_i1 = result;
         }
-        if (result.hasValue) {
-            return *new Register(1);
-        } else {
-            return result;
-        }
+        return left_i1;
     } else {
-        if (left.hasValue && left.value != 0) {
-            left.value = 1;
-        }
-        return left;
+        return left_i1;
     }
 }
 
@@ -988,6 +1019,9 @@ Register generateEqExp() {
             right = generateRelExp();
             result = getNewRegister(false,0,false, false, type.id, type.dim);
             printllvmCompare(result, left, right, op);
+            if (result.type.id == -2) {
+                result = printllvmZext(result);
+            }
             if (result.hasValue) {
                 return result;
             }
@@ -1013,6 +1047,9 @@ Register generateRelExp() {
             right = generateAddExp();
             result = getNewRegister(false, 0, false, false, type.id, type.dim);
             printllvmCompare(result, left, right, op);
+            if (result.type.id == -2) {
+                result = printllvmZext(result);
+            }
             if (result.hasValue) {
                 return result;
             }
@@ -1025,39 +1062,42 @@ Register generateRelExp() {
 }
 
 
-void skipOr() {
-    int count = 1;
-    for (; iter != TokenList.end() && count != 0; iter++) {
-        if (iter->getType() == "RPARENT") {
-            count--;
-        } else if (iter->getType() == "LPARENT") {
-            count++;
+bool isLastLAndExp() {
+    int i = 0;
+    bool flag = true;
+    while (iter + i != TokenList.end()) {
+        if ((iter+i)->getType() == "RPARENT" || (iter+i)->getType()=="SEMICN") {
+            break;
         }
+        if ((iter+i)->getType() == "OR") {
+            flag = false;
+        }
+        i++;
     }
-    iter--;
+    return flag;
 }
 
-void skipAnd() {
-    int count = 1;
-    for (; iter != TokenList.end() && count != 0; iter++) {
-        if (iter->getType() == "OR") {
-            return;
-        } else if (iter->getType() == "LPARENT") {
-            count++;
-        } else if (iter->getType() == "RPARENT") {
-            count --;
+bool isLastEqExp() {
+    int i = 0;
+    bool flag = true;
+    while (iter+i != TokenList.end()) {
+        if ((iter+i)->getType() == "RPARENT" || (iter+i)->getType() == "OR" || (iter+i)->getType()=="SEMICN") {
+            break;
         }
+        if ((iter+i)->getType() == "AND") {
+            flag = false;
+        }
+        i++;
     }
-    if (iter->getType() != "OR")
-        iter--;
+    return flag;
 }
+
 
 void generateForstmt() {
-    Register for_begin = getNewRegister(false, 0, false, false, -2, 0);
-    Register stmt_end = getNewRegister(false, 0, false, false, -2, 0);
-    Register stmt_begin = getNewRegister(false, 0, false, false, -2, 0);
-    Register for_end = getNewRegister(false, 0, false, false, -2, 0);
-    Register cond = Register(0);
+    Register for_begin = getNewRegister(false, 0, false, false, -3, 0);
+    Register stmt_end = getNewRegister(false, 0, false, false, -3, 0);
+    Register stmt_begin = getNewRegister(false, 0, false, false, -3, 0);
+    Register for_end = getNewRegister(false, 0, false, false, -3, 0);
     currentStmtEnd.push_back(stmt_end.name);
     currentForEnd.push_back(for_end.name);
 
@@ -1080,14 +1120,7 @@ void generateForstmt() {
             } else {
 
                 printllvmLabel(for_begin);
-                cond = generateCond();
-
-                if (!cond.hasValue) {
-                    if (cond.type.id != -2)
-                        cond = printllvmTruncCond(cond);
-                }
-
-                printllvmBranch(cond, stmt_begin, for_end);
+                generateCond(stmt_begin, for_end);
 
                 if (isToken("SEMICN", true, true, __FUNCTION__)) {
                 } else {

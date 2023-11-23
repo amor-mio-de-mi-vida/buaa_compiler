@@ -60,5 +60,6 @@ void parsePrintfStmt();
 int parseFuncCall();
 
 void printParserResult(const char* string);
+bool isLastStmt();
 
 #endif //HW2_PARSER_H

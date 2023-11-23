@@ -2,7 +2,7 @@
 const int _a = 3+2+-+2%2/1,_12 = 85;
 const int a=3+(1*2)/2*_a;
 const int arrayA[2] = {1,2};
-const int array_b[2][1] = {{1},{arrayA[0]}};
+const int array_b[2][1] = {{1},{1}};
 int array_c[2] = {1,2};
 int array_d[2][1] = {{1},{2}};
 int b=12,c_1;

@@ -20,21 +20,23 @@ extern int currentSymbolId;
 extern int currentFuncId;
 extern std::vector<Token>::iterator iter;
 extern std::vector<Token> TokenList;
+extern bool ir;
 
 extern unordered_map<int, SymbolTable> symbolTableList;
 extern unordered_map<int, Symbol> symbolList;
 
 void getLexerErrorMessage(const std::string& str) {
-    if (debug)
+    if (debug && error)
         fprintf(stderr, "Lexer error: %s at row: %d, column: %d\n", str.c_str(), rowNo, colNo);
 }
 
 void getParserErrorMessage(const std::string& str, Token& token, const char* funcname) {
-    if (debug)
+    if (debug && error)
         fprintf(stderr, "Parser error: %s at row: %d, column: %d, current function name is %s\n", str.c_str(), token.getRowNo(), token.getColNo(), funcname);
 }
 
 void printError(int num, char type, const char*statement) {
+    ir = false;
     if (error) {
         if (debug)
             cout << "In function " << statement << " error number: " << type << " in row " << num << endl;
@@ -75,10 +77,12 @@ void checkConst(const std::string& name, int row, const char* str) {
 }
 
 bool checkName(int row, const char* str, const std::string& name) {
-    int id = searchSymbolTable(name, false);
-    if (id != -1) {
-        printError(row, 'b', str);
-        return true;
+    if (error) {
+        int id = searchSymbolTable(name, false);
+        if (id != -1) {
+            printError(row, 'b', str);
+            return true;
+        }
     }
     return false;
 }

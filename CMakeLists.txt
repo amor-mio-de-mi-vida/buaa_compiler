@@ -15,4 +15,6 @@ add_executable(hw3 main.cpp
         llvm_ir.cpp
         llvm_ir.h
         generate_ir.h
-        generate_ir.cpp)
+        generate_ir.cpp
+        ir.h
+        ir.cpp)

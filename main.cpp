@@ -14,7 +14,7 @@ bool debug = false;
 bool comment = false; // 处理可换行的注释
 bool lexer = false; // 词法分析debug开关
 bool parser = false; // 语法分析debug开关
-bool error = false; // 错误处理debug开关
+bool error = true; // 错误处理debug开关
 bool ir = true; // llvm代码生成debug开关
 ifstream fin; // 输入文件的文件描述符
 ofstream fout; // 输出文件的文件描述符

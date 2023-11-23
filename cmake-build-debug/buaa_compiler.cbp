@@ -92,6 +92,12 @@
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/generate_ir.h">
 			<Option target="hw3"/>
 		</Unit>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/ir.cpp">
+			<Option target="hw3"/>
+		</Unit>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/ir.h">
+			<Option target="hw3"/>
+		</Unit>
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/lexer.cpp">
 			<Option target="hw3"/>
 		</Unit>

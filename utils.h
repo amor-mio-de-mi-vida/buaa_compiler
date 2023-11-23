@@ -21,6 +21,7 @@ public:
         this->boundary = *new vector<int>();
     }
     void pushBoundary(int bound);
+    string to_str() const;
 };
 
 class Symbol {
@@ -126,13 +127,15 @@ void pushRegisterTable();
 void popRegisterTable();
 bool isGlobalDecl();
 void pushRegister(const string& name, const Register& result);
-string typeToString(const Type& type);
+// string typeToString(const Type& type);
 int stringToType(const string& str);
 void searchFuncReturn(int id, int value);
 Register searchRegister(const string& name);
 void pushGlobalRegister(const string& name, const Register& result);
 bool isGlobalVar(const string& name);
 bool isGlobalRegister(const string& name);
+void assignRegister(const Register& old_reg, const Register& new_reg);
+bool isLastStmt();
 
 
 #endif //BUAA_COMPILER_UTILS_H

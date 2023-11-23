@@ -3,6 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/hw3.dir/error.cpp.o.d"
   "CMakeFiles/hw3.dir/generate_ir.cpp.o"
   "CMakeFiles/hw3.dir/generate_ir.cpp.o.d"
+  "CMakeFiles/hw3.dir/ir.cpp.o"
+  "CMakeFiles/hw3.dir/ir.cpp.o.d"
   "CMakeFiles/hw3.dir/lexer.cpp.o"
   "CMakeFiles/hw3.dir/lexer.cpp.o.d"
   "CMakeFiles/hw3.dir/llvm_ir.cpp.o"

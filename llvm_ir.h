@@ -15,7 +15,7 @@ void loadRegister(const Register& ptr, Register& result);
 
 void generateCompUnit();
 void generateMainFuncDef();
-void generateBlock();
+void generateBlock(bool funcBlock);
 void generateBlockItem();
 void generateStmt();
 void generateReturnStmt();
@@ -46,9 +46,9 @@ void generateAssignStmt();
 vector<Register> generateFuncRParams();
 Register generateFuncCall();
 void generateIfStmt();
-Register generateCond();
-Register generateLOrExp();
-Register generateLAndExp();
+void generateCond(const Register& true_label, const Register& false_label);
+void generateLOrExp(const Register& true_label, const Register& false_label);
+Register generateLAndExp(const Register& true_label,  const Register& false_label);
 Register generateEqExp();
 Register generateRelExp();
 void generateForstmt();
@@ -56,7 +56,7 @@ void generateForStmt();
 void generateBreakStmt();
 void generateContinueStmt();
 
-void skipOr();
-void skipAnd();
+bool isLastLAndExp();
+bool isLastEqExp();
 
 #endif //BUAA_COMPILER_LLVM_IR_H

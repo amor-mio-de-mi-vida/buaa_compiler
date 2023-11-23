@@ -5,6 +5,8 @@
     <excludeRoots>
       <file path="$PROJECT_DIR$/2023代码生成辅助库" />
       <file path="$PROJECT_DIR$/2023错误处理辅助库" />
+      <file path="$PROJECT_DIR$/result" />
+      <file path="$PROJECT_DIR$/test" />
       <file path="$PROJECT_DIR$/混合辅助测试库" />
     </excludeRoots>
   </component>

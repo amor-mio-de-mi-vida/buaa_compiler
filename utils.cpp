@@ -2,6 +2,9 @@
 // Created by 杨贺森 on 2023/11/1.
 //
 #include "utils.h"
+#include "lexer.h"
+#include "parser.h"
+
 int symbolTableId = 0;
 int currentSymbolTableId = 0;
 int symbolId = 0;
@@ -10,40 +13,81 @@ int currentFuncId = 0;
 int registerTableId = 0;
 int currentRegisterTableId = 0;
 
+
 unordered_map<int, SymbolTable> symbolTableList;
 unordered_map<int, Symbol> symbolList;
 unordered_map<int, RegisterTable> registerTableList;
 unordered_map<int, Register> registerList;
+
 
 void Type::pushBoundary(int bound) {
     dim++;
     this->boundary.push_back(bound);
 }
 
-string typeToString(const Type& type) {
-    if (type.id == -2) {
-        return "i1";
-    } if (type.id == -1) {
-        return "void";
-    } else if (type.id == 0 && type.dim == 0) {
-        return "i32";
-    } else if (type.id == 0 && type.dim == 1) {
-        if (type.boundary.size() == 1) {
-            return "[" + to_string(type.boundary.at(0)) + " x i32]";
-        } else {
-            return "i32*";
-        }
-    } else if (type.id == 0 && type.dim == 2) {
-        if (type.boundary.size() == 2) {
-            return "[" + to_string(type.boundary.at(0)) + " x [" + to_string(type.boundary.at(1)) + " x i32]]";
-        } else if (type.boundary.size() == 1) {
-            return "[" + to_string(type.boundary.at(0)) + " x i32]*";
-        } else if (type.boundary.empty()) {
-            return "int32**";
-        }
+string Type::to_str() const {
+    Type result = Type(this->id, 0);
+    string type_str;
+    if (this->id == -2) {
+        type_str = "i1";
+    } else if (this->id == -1) {
+        type_str = "void";
+    } else if (this->id == 0) {
+        type_str = "i32";
+    } else {
+        type_str = "not valid type_id";
     }
-    return "";
+
+    if (this->id == 0) {
+        if (this->dim == 0) {
+            return type_str;
+        }
+        if (this->dim == 1) {
+            if (this->boundary.empty()) {
+                return "i32*";
+            } else if (this->boundary.size() == 1) {
+                return "[" + to_string(this->boundary.at(0)) + " x " + type_str + "]";
+            }
+        } else if (this->dim == 2) {
+            if (this->boundary.size() == 1) {
+                return "[" + to_string(this->boundary.at(0)) + " x " + type_str + "] *";
+            } else if (this->boundary.size() == 2) {
+                return "[" + to_string(this->boundary.at(0)) + " x [" + to_string(this->boundary.at(1)) + " x " + type_str + "]]";
+            }
+        }
+    } else {
+        return type_str;
+    }
+
+    return "not valid type";
 }
+
+
+
+//string typeToString(const Type& type) {
+//    if (type.id == -2) {
+//        return "i1";
+//    } if (type.id == -1) {
+//        return "void";
+//    } else if (type.id == 0 && type.dim == 0) {
+//        return "i32";
+//    } else if (type.id == 0 && type.dim == 1) {
+//        if (type.boundary.size() == 1) {
+//            return "[" + to_string(type.boundary.at(0)) + " x i32]";
+//        } else {
+//            return "i32*";
+//        }
+//    } else if (type.id == 0 && type.dim == 2) {
+//        if (type.boundary.size() == 2) {
+//            return "[" + to_string(type.boundary.at(0)) + " x [" + to_string(type.boundary.at(1)) + " x i32]]";
+//        } else if (type.boundary.size() == 1) {
+//            return "[" + to_string(type.boundary.at(0)) + " x i32]*";
+//        } else if (type.boundary.empty()) {
+//            return "int32**";
+//        }
+//    }
+//    return "";
+//}
 
 int getParamNumber(Token token) {
     std::string string = token.getName();
@@ -210,16 +254,6 @@ bool isGlobalRegister(const string& name) {
     return false;
 }
 
-void searchFuncReturn(int id, int value) {
-    auto iter = registerTableList.at(0).directory.begin();
-    for (; iter != registerTableList.at(0).directory.end(); iter++) {
-        if (iter->second.id == id) {
-            iter->second.hasValue = true;
-            iter->second.value = value;
-        }
-    }
-}
-
 Register searchRegister(const string& name) {
     RegisterTable registerTable = registerTableList.at(currentRegisterTableId);
     while (true) {
@@ -254,4 +288,22 @@ bool isGlobalVar(const string& name) {
     if (iter != directory.end())
         return true;
     return false;
+}
+
+void assignRegister(const Register& old_reg, const Register& new_reg) {
+    RegisterTable registerTable = registerTableList.at(currentRegisterTableId);
+    while (true) {
+        auto iter = registerTable.directory.begin();
+        for (; iter != registerTable.directory.end(); iter++) {
+            if (iter->second.id == old_reg.id) {
+                iter->second = new_reg;
+                return;
+            }
+        }
+
+        if (registerTable.fatherId == registerTable.id) {
+            break;
+        }
+        registerTable = registerTableList.at(registerTable.fatherId);
+    }
 }

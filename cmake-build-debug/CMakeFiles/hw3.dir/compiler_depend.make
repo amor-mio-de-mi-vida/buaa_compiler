@@ -1632,6 +1632,9 @@ CMakeFiles/hw3.dir/generate_ir.cpp.o: /Users/yanghesen/Desktop/buaa_compiler/gen
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__filesystem/recursive_directory_iterator.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__filesystem/u8path.h
 
+CMakeFiles/hw3.dir/ir.cpp.o: /Users/yanghesen/Desktop/buaa_compiler/ir.cpp \
+  /Users/yanghesen/Desktop/buaa_compiler/ir.h
+
 CMakeFiles/hw3.dir/lexer.cpp.o: /Users/yanghesen/Desktop/buaa_compiler/lexer.cpp \
   /Users/yanghesen/Desktop/buaa_compiler/lexer.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/iostream \
@@ -5674,7 +5677,8 @@ CMakeFiles/hw3.dir/utils.cpp.o: /Users/yanghesen/Desktop/buaa_compiler/utils.cpp
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/include/sys/_types/_fsfilcnt_t.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/include/_types/_nl_item.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__bsd_locale_defaults.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/cstdarg
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/cstdarg \
+  /Users/yanghesen/Desktop/buaa_compiler/parser.h
 
 
 /Users/yanghesen/Desktop/buaa_compiler/utils.cpp:
@@ -5682,6 +5686,10 @@ CMakeFiles/hw3.dir/utils.cpp.o: /Users/yanghesen/Desktop/buaa_compiler/utils.cpp
 /Users/yanghesen/Desktop/buaa_compiler/parser.h:
 
 /Users/yanghesen/Desktop/buaa_compiler/llvm_ir.cpp:
+
+/Users/yanghesen/Desktop/buaa_compiler/ir.h:
+
+/Users/yanghesen/Desktop/buaa_compiler/ir.cpp:
 
 /Users/yanghesen/Desktop/buaa_compiler/llvm_ir.h:
 

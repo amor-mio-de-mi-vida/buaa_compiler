@@ -177,6 +177,30 @@ generate_ir.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/hw3.dir/build.make CMakeFiles/hw3.dir/generate_ir.cpp.s
 .PHONY : generate_ir.cpp.s
 
+ir.o: ir.cpp.o
+.PHONY : ir.o
+
+# target to build an object file
+ir.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hw3.dir/build.make CMakeFiles/hw3.dir/ir.cpp.o
+.PHONY : ir.cpp.o
+
+ir.i: ir.cpp.i
+.PHONY : ir.i
+
+# target to preprocess a source file
+ir.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hw3.dir/build.make CMakeFiles/hw3.dir/ir.cpp.i
+.PHONY : ir.cpp.i
+
+ir.s: ir.cpp.s
+.PHONY : ir.s
+
+# target to generate assembly for a file
+ir.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hw3.dir/build.make CMakeFiles/hw3.dir/ir.cpp.s
+.PHONY : ir.cpp.s
+
 lexer.o: lexer.cpp.o
 .PHONY : lexer.o
 
@@ -312,6 +336,9 @@ help:
 	@echo "... generate_ir.o"
 	@echo "... generate_ir.i"
 	@echo "... generate_ir.s"
+	@echo "... ir.o"
+	@echo "... ir.i"
+	@echo "... ir.s"
 	@echo "... lexer.o"
 	@echo "... lexer.i"
 	@echo "... lexer.s"
