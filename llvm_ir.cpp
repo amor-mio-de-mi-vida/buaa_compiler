@@ -62,18 +62,26 @@ Register allocRegister(const Type& type) {
     return ptr;
 }
 
-void storeInitial(const Register& basePtr, const vector<Register>& value) {
+void storeInitial(const Register& basePtr, vector<Register> value) {
     if (!value.empty()) {
         if (basePtr.type.dim == 0) {
             storeRegister(basePtr, value.at(0));
         } else if (basePtr.type.dim == 1) {
-            for (int i = 0; i < value.size(); i++) {
+            int boundary = basePtr.type.boundary.at(0);
+            for (int index = (int) value.size(); index < boundary; index++) {
+                value.emplace_back(0);
+            }
+            for (int i = 0; i < boundary; i++) {
                 Register ptr = printllvmGetElementPtr(basePtr, i);
                 storeRegister(ptr, value.at(i));
             }
         } else if (basePtr.type.dim == 2) {
             int boundary_x = basePtr.type.boundary.at(0);
             int boundary_y = basePtr.type.boundary.at(1);
+            int boundary = boundary_x * boundary_y;
+            for (int index = (int) value.size(); index < boundary; index++) {
+                value.emplace_back(0);
+            }
             for (int i = 0; i < boundary_x; i++) {
                 for (int j = 0; j < boundary_y; j++) {
                     if (i * boundary_y + j < value.size()) {
@@ -181,8 +189,9 @@ void generateMainFuncDef() {
 void generateBlock(bool funcBlock) {
     if (isToken("LBRACE", true, true, __FUNCTION__)) {
         while (!isToken("RBRACE", true, false, __FUNCTION__)) {
+            bool isReturn = iter->getType() == "RETURNTK";
             generateBlockItem();
-            if (funcBlock && isLastStmt() && iter->getType() != "RETURNTK" && currentFuncReturnType == 0) {
+            if (funcBlock && isLastStmt() && !isReturn && currentFuncReturnType == 0) {
                 printllvm("    ret void\n");
             }
         }
@@ -613,7 +622,7 @@ Register generateLVal(bool left) {
 
     if (info.empty()) {
         if (basePtr.type.dim == 0) {
-            if (!globalDeclare) {
+            if (!globalDeclare && !left) {
                 loadRegister(basePtr, result);
                 basePtr.name = result.name;
             }

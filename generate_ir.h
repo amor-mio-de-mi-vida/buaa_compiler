@@ -18,7 +18,7 @@ void printllvmCompare(Register& result, const Register& left, const Register& ri
 void printllvmFuncDef(int retype, const string& name, const vector<Register>& params);
 void printllvmReturnStmt(int retype, const Register& name);
 void printllvmGlobalConst(const string& name, const Type& type);
-void printllvmGlobalAssign(const string& name, const Type& type, const vector<Register>& value);
+void printllvmGlobalAssign(const string& name, const Type& type, vector<Register> value);
 void printllvmGlobalVar(const string& name, const Type& type);
 void printllvmGetintStmt(const Register& left);
 void printllvmPrintfStmt(const string& str, const vector<Register>& params);

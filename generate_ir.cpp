@@ -209,7 +209,7 @@ void printllvmFuncDef(int retype, const string& name, const vector<Register>& pa
     }
     const string& str3 = ") {\n";
     printllvm(str1 + str2 + str3);
-    for (int i = params.size() - 1; i >= 0 ; i--) {
+    for (int i = (int) params.size() - 1; i >= 0 ; i--) {
         allocRegister(params.at(i));
         storeRegister(params.at(i), values.at(i));
     }
@@ -221,7 +221,7 @@ void printllvmGlobalConst(const string& name, const Type& type) {
     printllvm(str);
 }
 
-void printllvmGlobalAssign(const string& name, const Type& type, const vector<Register>& value) {
+void printllvmGlobalAssign(const string& name, const Type& type, vector<Register> value) {
     string str;
     int boundary;
     string type_str = value.at(0).type.to_str();
@@ -230,6 +230,9 @@ void printllvmGlobalAssign(const string& name, const Type& type, const vector<Re
         str = to_string(value.at(0).value) + "\n";
     } if (type.dim == 1) {
         boundary = type.boundary.at(0);
+        for (int index = (int) value.size(); index < boundary; index++) {
+            value.emplace_back(0);
+        }
         bool flag = true; // 判断这一组是否都为0
         string str0;
         for (int i = 0; i < boundary; i++) {
@@ -248,6 +251,9 @@ void printllvmGlobalAssign(const string& name, const Type& type, const vector<Re
         }
     } else if (type.dim == 2) {
         boundary = type.boundary.at(0) * type.boundary.at(1);
+        for (int index = (int) value.size(); index < boundary; index++) {
+            value.emplace_back(0);
+        }
         string str1;
         int flag0 = true;
         for (int i = 0; i < boundary; i += type.boundary.at(1)) {
@@ -360,17 +366,36 @@ Register printllvmGetElementPtr(const Register& basePtr) {
     if (basePtr.type.dim == 0) {
         return basePtr;
     } else if (basePtr.type.dim == 1) {
-        Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim);
-        string str = "    "+result.name+" = getelementptr "+ basePtr.type.to_str()+", "+basePtr.type.to_str()+"* " + basePtr.addr + ", i32 0\n";
-        printllvm(str);
-        return result;
+        if (basePtr.type.boundary.empty()) {
+            Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim);
+            string str = "    " + result.name + " = load " + result.type.to_str() + ", " + result.type.to_str() + "* " + basePtr.name + "\n";
+            printllvm(str);
+            return result;
+        } else if (basePtr.type.boundary.size() == 1) {
+            Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim);
+            result.type.boundary = basePtr.type.boundary;
+            result.type.boundary.erase(result.type.boundary.begin());
+            string str = "    "+result.name+" = getelementptr "+ basePtr.type.to_str()+", "+basePtr.type.to_str()+"* " + basePtr.addr + ", i32 0, i32 0\n";
+            printllvm(str);
+            return result;
+        }
     } else if (basePtr.type.dim == 2) {
-        Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim);
-        result.type.boundary = basePtr.type.boundary;
-        result.type.boundary.erase(result.type.boundary.begin());
-        string str = "    "+result.name+" = getelementptr "+ basePtr.type.to_str()+", "+basePtr.type.to_str()+"* " + basePtr.addr + ", i32 0 \n";
-        printllvm(str);
-        return result;
+        if (basePtr.type.boundary.size() == 1) {
+            Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim);
+            result.type.boundary = basePtr.type.boundary;
+            string str = "    " + result.name + " = load " + result.type.to_str() + ", " + result.type.to_str() + "* " + basePtr.name + "\n";
+            printllvm(str);
+            return result;
+        } else if (basePtr.type.boundary.size() == 2) {
+            Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim);
+            result.type.boundary = basePtr.type.boundary;
+            result.type.boundary.erase(result.type.boundary.begin());
+            string str =
+                    "    " + result.name + " = getelementptr " + basePtr.type.to_str() + ", " + basePtr.type.to_str() +
+                    "* " + basePtr.addr + ", i32 0, i32 0\n";
+            printllvm(str);
+            return result;
+        }
     }
     return *new Register(0);
 }
@@ -395,20 +420,25 @@ Register printllvmGetElementPtr(const Register& basePtr, const Register& value_i
         result.type.boundary = basePtr.type.boundary;
         string str = "    " + result.name + " = getelementptr " + result.type.to_str() + ", " +
                      result.type.to_str() + "* " + basePtr.addr + ", i32 " +
-                     value_i.name + "\n";
+                     value_i.name + ", i32 0\n";
         printllvm(str);
         result.type.boundary.pop_back();
         return result;
     } else if (basePtr.type.dim == 2 && basePtr.type.boundary.size() == 2) {
+//        Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim - 1);
+//        result.type.boundary = basePtr.type.boundary;
+//        result.type.boundary.pop_back();
+//        Register index = getNewRegister(false, 0, false, false, 0, 0);
+//        printllvmcalculate(index, value_i, Register(basePtr.type.boundary.at(1)), "MULT");
+//        string str = "    " + result.name + " = getelementptr " + result.type.to_str() + ", " +
+//                result.type.to_str() + "* " + basePtr.addr + ", i32 0, i32 " + index.name + "\n";
+//        printllvm(str);
+//        result.type.boundary.pop_back();
+//        return result;
         Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim - 1);
-        result.type.boundary = basePtr.type.boundary;
-        result.type.boundary.pop_back();
-        Register index = getNewRegister(false, 0, false, false, 0, 0);
-        printllvmcalculate(index, value_i, Register(basePtr.type.boundary.at(1)), "MULT");
-        string str = "    " + result.name + " = getelementptr " + result.type.to_str() + ", " +
-                result.type.to_str() + "* " + basePtr.addr + ", i32 0, i32 " + index.name + "\n";
+        string str = "    " + result.name + " = getelementptr " + basePtr.type.to_str() + ", " +
+                    basePtr.type.to_str() + "* " + basePtr.addr + ", i32 0, i32 " +  value_i.name + ", i32 0\n";
         printllvm(str);
-        result.type.boundary.pop_back();
         return result;
     }
     return *new Register(0);
@@ -416,17 +446,23 @@ Register printllvmGetElementPtr(const Register& basePtr, const Register& value_i
 
 Register printllvmGetElementPtr(const Register& basePtr, const Register& value_i, const Register& value_j) {
     if (basePtr.type.dim == 2 && basePtr.type.boundary.size() == 1) {
-        Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim - 1);
-        result.type.boundary = basePtr.type.boundary;
-        string str = "    " + result.name + " = getelementptr " + result.type.to_str() + ", " +
-                     result.type.to_str() + "* " + basePtr.addr + ", i32 " +
-                     value_i.name + "\n";
+//        Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim - 1);
+//        result.type.boundary = basePtr.type.boundary;
+//        string str = "    " + result.name + " = getelementptr " + result.type.to_str() + ", " +
+//                     result.type.to_str() + "* " + basePtr.addr + ", i32 " +
+//                     value_i.name + "\n";
+//        printllvm(str);
+//        Register result2 = getNewRegister(false, 0, false, false, result.type.id, result.type.dim - 1);
+//        string str2 = "    " + result2.name + " = getelementptr " + result.type.to_str() + ", " +
+//                      result.type.to_str() + "* " + result.name + ", i32 0, i32 " + value_j.name + "\n";
+//        printllvm(str2);
+//        return result2;
+        Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim - 2);
+        Type type = Type(basePtr.type.id, basePtr.type.dim - 1);
+        type.boundary = basePtr.type.boundary;
+        string str = "    " + result.name + " = getelementptr "+type.to_str()+", "+type.to_str()+"* "+basePtr.name+", i32 "+value_i.name+", i32 "+value_j.name+"\n";
         printllvm(str);
-        Register result2 = getNewRegister(false, 0, false, false, result.type.id, result.type.dim - 1);
-        string str2 = "    " + result2.name + " = getelementptr " + result.type.to_str() + ", " +
-                      result.type.to_str() + "* " + result.name + ", i32 0, i32 " + value_j.name + "\n";
-        printllvm(str2);
-        return result2;
+        return result;
     } else if (basePtr.type.dim == 2 && basePtr.type.boundary.size() == 2) {
         Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim - 2);
         result.type.boundary = basePtr.type.boundary;

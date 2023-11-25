@@ -9,7 +9,7 @@
 Register getNewRegister(int num);
 Register getNewRegister(bool hasValue, int value, bool isGlobal, bool isConst, int type_id, int dim);
 Register allocRegister(const Type& type);
-void storeInitial(const Register& basePtr, const vector<Register>& value);
+void storeInitial(const Register& basePtr, vector<Register> value);
 void storeRegister(const Register& ptr, const Register& value);
 void loadRegister(const Register& ptr, Register& result);
 
