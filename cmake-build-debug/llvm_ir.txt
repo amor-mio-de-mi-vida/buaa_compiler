@@ -3,373 +3,218 @@ declare void @putint(i32)      ; 输出一个整数
 declare void @putch(i32)       ; 输出一个字符
 declare void @putstr(i8*)      ; 输出字符串
 
-@a = dso_local constant i32 1
-@b = dso_local constant i32 13
-@_a_b = dso_local constant [1 x i32] [i32 5]
-@_a_3_b = dso_local constant [2 x [1 x i32]] [[1 x i32] zeroinitializer, [1 x i32] [i32 12]]
-@c = dso_local global i32 zeroinitializer
-@d = dso_local global [1 x i32] zeroinitializer
-@_a_4_b = dso_local global [2 x [1 x i32]] [[1 x i32] zeroinitializer, [1 x i32] [i32 12]]
-@z = dso_local global i32 zeroinitializer
-@_d_e = dso_local global i32 1
-@glo_1 = dso_local global i32 zeroinitializer
-@glo_2 = dso_local global i32 zeroinitializer
-@glo_3 = dso_local global i32 zeroinitializer
-@glo_4 = dso_local global i32 zeroinitializer
-@glo_5 = dso_local global i32 zeroinitializer
-@glo_6 = dso_local global i32 zeroinitializer
-@glo_7 = dso_local global i32 zeroinitializer
-@glo_8 = dso_local global i32 zeroinitializer
-@glo_9 = dso_local global i32 zeroinitializer
-define dso_local void @test_1(i32 %temp42, i32* %temp43, [1 x i32] * %temp44) {
-    %temp41 = alloca [1 x i32]*
-    store [1 x i32]* %temp44, [1 x i32]* * %temp41
-    %temp40 = alloca i32*
-    store i32* %temp43, i32** %temp40
-    %temp39 = alloca i32
-    store i32 %temp42, i32* %temp39
-    %temp47 = load i32, i32* %temp39
-    %temp49 = load i32*, i32** %temp40
-    %temp50 = getelementptr i32, i32* %temp49, i32 0
-    %temp48 = load i32, i32* %temp50
-    %temp51 = add i32 %temp47, %temp48
-    %temp53 = load [1 x i32] *, [1 x i32] ** %temp41
-    %temp54 = getelementptr [1 x i32], [1 x i32]* %temp53, i32 0, i32 0
-    %temp52 = load i32, i32* %temp54
-    %temp55 = add i32 %temp51, %temp52
-    store i32 %temp55, i32* @c
-    ret void
-    ret void
-}
-
 define dso_local i32 @main() {
-    %temp57 = alloca i32
-    store i32 1, i32* %temp57
-    %temp58 = alloca i32
-    %temp59 = mul i32 2, 6
-    %temp60 = add i32 %temp59, 1
-    store i32 %temp60, i32* %temp58
-    %temp62 = sdiv i32 2, 2
-    %temp63 = mul i32 %temp62, 2
-    %temp61 = sub i32 2, %temp63
-    %temp64 = add i32 %temp61, 1
-    %temp65 = alloca [0 x i32]
-    %temp66 = load i32, i32* @a
-    %temp67 = sdiv i32 2, 2
-    %temp68 = add i32 %temp67, 1
-    %temp69 = mul i32 2, 1
-    %temp70 = sub i32 %temp69, 1
-    %temp71 = alloca [0 x [0 x i32]]
-    %temp73 = sdiv i32 3452, 2
-    %temp74 = mul i32 %temp73, 2
-    %temp72 = sub i32 3452, %temp74
-    %temp75 = mul i32 4, 3
-    %temp76 = add i32 %temp72, %temp75
-    %temp77 = alloca i32
-    %temp79 = sdiv i32 2, 2
-    %temp80 = mul i32 %temp79, 2
-    %temp78 = sub i32 2, %temp80
-    %temp81 = add i32 %temp78, 1
-    %temp82 = alloca [0 x i32]
-    %temp83 = sdiv i32 2, 2
-    %temp84 = add i32 %temp83, 1
-    %temp85 = mul i32 2, 1
-    %temp86 = sub i32 %temp85, 1
-    %temp87 = alloca [0 x [0 x i32]]
-    %temp89 = sdiv i32 3452, 2
-    %temp90 = mul i32 %temp89, 2
-    %temp88 = sub i32 3452, %temp90
-    %temp91 = mul i32 4, 3
-    %temp92 = add i32 %temp88, %temp91
-    %temp93 = alloca i32
-    %temp95 = getelementptr [0 x [0 x i32]], [0 x [0 x i32]]*%temp71, i32 0, i32 0, i32 0
-    %temp94 = load i32, i32* %temp95
-    %temp97 = getelementptr [0 x [0 x i32]], [0 x [0 x i32]]*%temp87, i32 0, i32 0, i32 0
-    %temp96 = load i32, i32* %temp97
-    %temp98 = add i32 %temp94, %temp96
-    %temp99 = load i32, i32* @b
-    %temp100 = mul i32 %temp98, %temp99
-    %temp101 = add i32 %temp100, 1
-    store i32 %temp101, i32* %temp93
-    %temp105 = getelementptr [0 x i32], [0 x i32]* %temp82, i32 0, i32 0
-    %temp104 = load i32, i32* %temp105
-    store i32 1, i32* %temp105
-    %temp109 = getelementptr [0 x [0 x i32]], [0 x [0 x i32]]*%temp87, i32 0, i32 0, i32 0
-    %temp108 = load i32, i32* %temp109
-    store i32 1, i32* %temp109
-    %temp112 = load i32, i32* %temp93
-    %temp114 = getelementptr [0 x [0 x i32]], [0 x [0 x i32]]*%temp87, i32 0, i32 0, i32 0
-    %temp113 = load i32, i32* %temp114
-    %temp115 = add i32 %temp112, %temp113
-    store i32 %temp115, i32* %temp77
-    %temp118 = call i32 @getint()
-    store i32 %temp118, i32* @glo_1
-    %temp121 = call i32 @getint()
-    store i32 %temp121, i32* @glo_2
-    %temp124 = call i32 @getint()
-    store i32 %temp124, i32* @glo_3
-    %temp127 = call i32 @getint()
-    store i32 %temp127, i32* @glo_4
-    %temp130 = call i32 @getint()
-    store i32 %temp130, i32* @glo_5
-    %temp133 = call i32 @getint()
-    store i32 %temp133, i32* @glo_6
-    %temp136 = call i32 @getint()
-    store i32 %temp136, i32* @glo_7
-    %temp139 = call i32 @getint()
-    store i32 %temp139, i32* @glo_8
-    %temp142 = call i32 @getint()
-    store i32 %temp142, i32* @glo_9
-    %temp143 = load i32, i32* %temp77
-    %temp145 = getelementptr [0 x i32], [0 x i32]* %temp82, i32 0, i32 0
-    %temp147 = getelementptr [0 x [0 x i32]], [0 x [0 x i32]]* %temp87, i32 0, i32 0
-    call void @test_1(i32 %temp143, i32* %temp145, [0 x i32] * %temp147)
-    br label %temp149
+    %temp6 = add i32 2, 0
+    %temp7 = add i32 4, 0
+    %temp5 = icmp sle i32 %temp6, %temp7
+    %temp8 = zext i1 %temp5 to i32
+    %temp10 = add i32 0, 0
+    %temp9 = icmp ne i32 %temp8, %temp10
+    br i1 %temp9, label %temp4, label %temp3
 
-temp149:
-    %temp154 = load i32, i32* @glo_9
-    %temp156 = add i32 %temp154, 0
-    %temp157 = add i32 0, 0
-    %temp155 = icmp sgt i32 %temp156, %temp157
-    %temp158 = zext i1 %temp155 to i32
-    %temp160 = add i32 0, 0
-    %temp159 = icmp ne i32 %temp158, %temp160
-    br i1 %temp159, label %temp151, label %temp153
+temp4:
+    %temp13 = add i32 3, 0
+    %temp14 = add i32 0, 0
+    %temp12 = icmp ne i32 %temp13, %temp14
+    %temp15 = and i1 %temp9, %temp12
+    br i1 %temp15, label %temp11, label %temp3
 
-temp153:
-    %temp162 = load i32, i32* @glo_8
-    %temp164 = add i32 %temp162, 0
-    %temp165 = add i32 0, 0
-    %temp163 = icmp sgt i32 %temp164, %temp165
-    %temp166 = zext i1 %temp163 to i32
-    %temp168 = add i32 0, 0
-    %temp167 = icmp ne i32 %temp166, %temp168
-    br i1 %temp167, label %temp161, label %temp152
+temp11:
+    %temp17 = add i32 3, 0
+    %temp18 = add i32 0, 0
+    %temp16 = icmp sge i32 %temp17, %temp18
+    %temp19 = zext i1 %temp16 to i32
+    %temp21 = add i32 0, 0
+    %temp20 = icmp ne i32 %temp19, %temp21
+    %temp22 = and i1 %temp15, %temp20
+    br i1 %temp22, label %temp1, label %temp3
 
-temp161:
-    %temp169 = load i32, i32* @glo_7
-    %temp171 = add i32 %temp169, 0
-    %temp172 = add i32 0, 0
-    %temp170 = icmp sgt i32 %temp171, %temp172
-    %temp173 = zext i1 %temp170 to i32
-    %temp175 = add i32 0, 0
-    %temp174 = icmp ne i32 %temp173, %temp175
-    %temp176 = and i1 %temp167, %temp174
-    br i1 %temp176, label %temp151, label %temp152
+temp3:
+    %temp26 = add i32 2, 0
+    %temp27 = add i32 4, 0
+    %temp25 = icmp sle i32 %temp26, %temp27
+    %temp28 = zext i1 %temp25 to i32
+    %temp30 = add i32 0, 0
+    %temp29 = icmp ne i32 %temp28, %temp30
+    br i1 %temp29, label %temp24, label %temp23
 
-    %temp177 = or i1 %temp159, %temp176
-    br i1 %temp177, label %temp151, label %temp152
+temp24:
+    %temp33 = add i32 4, 0
+    %temp34 = add i32 0, 0
+    %temp32 = icmp ne i32 %temp33, %temp34
+    %temp35 = and i1 %temp29, %temp32
+    br i1 %temp35, label %temp31, label %temp23
 
-temp150:
-    br label %temp149
+temp31:
+    %temp38 = add i32 0, 0
+    %temp39 = add i32 0, 0
+    %temp37 = icmp ne i32 %temp38, %temp39
+    %temp40 = and i1 %temp35, %temp37
+    br i1 %temp40, label %temp36, label %temp23
 
-temp151:
-    %temp180 = load i32, i32* @glo_2
-    %temp182 = add i32 %temp180, 0
-    %temp183 = add i32 2, 0
-    %temp181 = icmp sgt i32 %temp182, %temp183
-    %temp184 = zext i1 %temp181 to i32
-    %temp186 = add i32 0, 0
-    %temp185 = icmp ne i32 %temp184, %temp186
-    br i1 %temp185, label %temp178, label %temp179
+temp36:
+    %temp42 = add i32 2, 0
+    %temp43 = add i32 0, 0
+    %temp41 = icmp ne i32 %temp42, %temp43
+    %temp44 = and i1 %temp40, %temp41
+    br i1 %temp44, label %temp1, label %temp23
 
-temp178:
-    %temp189 = load i32, i32* @glo_2
-    %temp190 = sub i32 %temp189, 1
-    store i32 %temp190, i32* @glo_2
-    br label %temp150
+    %temp45 = or i1 %temp22, %temp44
+    br i1 %temp45, label %temp1, label %temp23
 
-    br label %temp191
+temp23:
+    %temp48 = add i32 1, 0
+    %temp49 = add i32 0, 0
+    %temp47 = icmp ne i32 %temp48, %temp49
+    br i1 %temp47, label %temp46, label %temp2
 
-temp179:
-    %temp194 = load i32, i32* @glo_2
-    %temp195 = sub i32 %temp194, 1
-    store i32 %temp195, i32* @glo_2
-    %temp198 = load i32, i32* @glo_1
-    %temp199 = sub i32 %temp198, 1
-    store i32 %temp199, i32* @glo_1
-    %temp202 = load i32, i32* @glo_1
-    %temp204 = add i32 %temp202, 0
-    %temp205 = add i32 0, 0
-    %temp203 = icmp slt i32 %temp204, %temp205
-    %temp206 = zext i1 %temp203 to i32
-    %temp208 = add i32 0, 0
-    %temp207 = icmp ne i32 %temp206, %temp208
-    br i1 %temp207, label %temp200, label %temp201
+temp46:
+    %temp51 = add i32 3, 0
+    %temp52 = add i32 2, 0
+    %temp50 = icmp slt i32 %temp51, %temp52
+    %temp53 = zext i1 %temp50 to i32
+    %temp55 = add i32 0, 0
+    %temp54 = icmp ne i32 %temp53, %temp55
+    %temp56 = and i1 %temp47, %temp54
+    br i1 %temp56, label %temp1, label %temp2
 
-temp200:
-    br label %temp152
+    %temp57 = or i1 %temp45, %temp56
+    br i1 %temp57, label %temp1, label %temp2
 
-    br label %temp201
-
-temp201:
-    br label %temp191
-
-temp191:
-    br label %temp150
-
-temp152:
-    %temp209 = load i32, i32* @glo_1
-    call void @putch(i32 62)
-    call void @putch(i32 47)
-    call void @putch(i32 33)
-    call void @putch(i32 126)
-    call void @putch(i32 118)
-    call void @putch(i32 97)
+temp1:
+    call void @putch(i32 116)
     call void @putch(i32 114)
-    call void @putch(i32 103)
-    call void @putch(i32 49)
-    call void @putch(i32 32)
-    call void @putch(i32 105)
-    call void @putch(i32 115)
-    call void @putch(i32 58)
-    call void @putint(i32 %temp209)
-    call void @putch(i32 59)
-    call void @putch(i32 126)
+    call void @putch(i32 117)
+    call void @putch(i32 101)
     call void @putch(i32 10)
-    %temp210 = load i32, i32* @glo_2
-    call void @putch(i32 62)
-    call void @putch(i32 47)
-    call void @putch(i32 33)
-    call void @putch(i32 126)
-    call void @putch(i32 118)
+    br label %temp58
+
+temp2:
+    call void @putch(i32 102)
+    call void @putch(i32 108)
     call void @putch(i32 97)
-    call void @putch(i32 114)
-    call void @putch(i32 103)
-    call void @putch(i32 50)
-    call void @putch(i32 32)
-    call void @putch(i32 105)
     call void @putch(i32 115)
-    call void @putch(i32 58)
-    call void @putint(i32 %temp210)
-    call void @putch(i32 59)
-    call void @putch(i32 126)
+    call void @putch(i32 101)
     call void @putch(i32 10)
-    %temp211 = load i32, i32* @glo_3
-    call void @putch(i32 62)
-    call void @putch(i32 47)
-    call void @putch(i32 33)
-    call void @putch(i32 126)
-    call void @putch(i32 118)
-    call void @putch(i32 97)
-    call void @putch(i32 114)
-    call void @putch(i32 103)
-    call void @putch(i32 51)
+    br label %temp58
+
+temp58:
+    %temp59 = alloca i32
+    store i32 0, i32* %temp59
+    br label %temp60
+
+temp60:
+    %temp67 = add i32 2, 0
+    %temp68 = add i32 4, 0
+    %temp66 = icmp sle i32 %temp67, %temp68
+    %temp69 = zext i1 %temp66 to i32
+    %temp71 = add i32 0, 0
+    %temp70 = icmp ne i32 %temp69, %temp71
+    br i1 %temp70, label %temp65, label %temp64
+
+temp65:
+    %temp74 = add i32 3, 0
+    %temp75 = add i32 0, 0
+    %temp73 = icmp ne i32 %temp74, %temp75
+    %temp76 = and i1 %temp70, %temp73
+    br i1 %temp76, label %temp72, label %temp64
+
+temp72:
+    %temp78 = add i32 3, 0
+    %temp79 = add i32 0, 0
+    %temp77 = icmp sge i32 %temp78, %temp79
+    %temp80 = zext i1 %temp77 to i32
+    %temp82 = add i32 0, 0
+    %temp81 = icmp ne i32 %temp80, %temp82
+    %temp83 = and i1 %temp76, %temp81
+    br i1 %temp83, label %temp62, label %temp64
+
+temp64:
+    %temp87 = add i32 2, 0
+    %temp88 = add i32 4, 0
+    %temp86 = icmp sle i32 %temp87, %temp88
+    %temp89 = zext i1 %temp86 to i32
+    %temp91 = add i32 0, 0
+    %temp90 = icmp ne i32 %temp89, %temp91
+    br i1 %temp90, label %temp85, label %temp84
+
+temp85:
+    %temp94 = add i32 4, 0
+    %temp95 = add i32 0, 0
+    %temp93 = icmp ne i32 %temp94, %temp95
+    %temp96 = and i1 %temp90, %temp93
+    br i1 %temp96, label %temp92, label %temp84
+
+temp92:
+    %temp99 = add i32 0, 0
+    %temp100 = add i32 0, 0
+    %temp98 = icmp ne i32 %temp99, %temp100
+    %temp101 = and i1 %temp96, %temp98
+    br i1 %temp101, label %temp97, label %temp84
+
+temp97:
+    %temp103 = add i32 2, 0
+    %temp104 = add i32 0, 0
+    %temp102 = icmp ne i32 %temp103, %temp104
+    %temp105 = and i1 %temp101, %temp102
+    br i1 %temp105, label %temp62, label %temp84
+
+    %temp106 = or i1 %temp83, %temp105
+    br i1 %temp106, label %temp62, label %temp84
+
+temp84:
+    %temp109 = add i32 1, 0
+    %temp110 = add i32 0, 0
+    %temp108 = icmp ne i32 %temp109, %temp110
+    br i1 %temp108, label %temp107, label %temp63
+
+temp107:
+    %temp112 = add i32 3, 0
+    %temp113 = add i32 2, 0
+    %temp111 = icmp slt i32 %temp112, %temp113
+    %temp114 = zext i1 %temp111 to i32
+    %temp116 = add i32 0, 0
+    %temp115 = icmp ne i32 %temp114, %temp116
+    %temp117 = and i1 %temp108, %temp115
+    br i1 %temp117, label %temp62, label %temp63
+
+    %temp118 = or i1 %temp106, %temp117
+    br i1 %temp118, label %temp62, label %temp63
+
+temp61:
+    br label %temp60
+
+temp62:
+    %temp121 = load i32, i32* %temp59
+    %temp122 = add i32 %temp121, 1
+    store i32 %temp122, i32* %temp59
+    %temp125 = load i32, i32* %temp59
+    %temp127 = add i32 1, 0
+    %temp126 = icmp sgt i32 %temp125, %temp127
+    %temp128 = zext i1 %temp126 to i32
+    %temp130 = add i32 0, 0
+    %temp129 = icmp ne i32 %temp128, %temp130
+    br i1 %temp129, label %temp123, label %temp124
+
+temp123:
+    br label %temp63
+
+    br label %temp124
+
+temp124:
+    br label %temp61
+
+temp63:
+    call void @putch(i32 101)
+    call void @putch(i32 110)
+    call void @putch(i32 100)
     call void @putch(i32 32)
-    call void @putch(i32 105)
-    call void @putch(i32 115)
-    call void @putch(i32 58)
-    call void @putint(i32 %temp211)
-    call void @putch(i32 59)
-    call void @putch(i32 126)
-    call void @putch(i32 10)
-    %temp212 = load i32, i32* @glo_4
-    call void @putch(i32 62)
-    call void @putch(i32 47)
-    call void @putch(i32 33)
-    call void @putch(i32 126)
-    call void @putch(i32 118)
-    call void @putch(i32 97)
+    call void @putch(i32 102)
+    call void @putch(i32 111)
     call void @putch(i32 114)
-    call void @putch(i32 103)
-    call void @putch(i32 52)
     call void @putch(i32 32)
-    call void @putch(i32 105)
-    call void @putch(i32 115)
-    call void @putch(i32 58)
-    call void @putint(i32 %temp212)
-    call void @putch(i32 59)
-    call void @putch(i32 126)
-    call void @putch(i32 10)
-    %temp213 = load i32, i32* @glo_5
-    call void @putch(i32 62)
-    call void @putch(i32 47)
     call void @putch(i32 33)
-    call void @putch(i32 126)
-    call void @putch(i32 118)
-    call void @putch(i32 97)
-    call void @putch(i32 114)
-    call void @putch(i32 103)
-    call void @putch(i32 53)
     call void @putch(i32 32)
-    call void @putch(i32 105)
-    call void @putch(i32 115)
-    call void @putch(i32 58)
-    call void @putint(i32 %temp213)
-    call void @putch(i32 59)
-    call void @putch(i32 126)
-    call void @putch(i32 10)
-    %temp214 = load i32, i32* @glo_6
-    call void @putch(i32 62)
-    call void @putch(i32 47)
-    call void @putch(i32 33)
-    call void @putch(i32 126)
-    call void @putch(i32 118)
-    call void @putch(i32 97)
-    call void @putch(i32 114)
-    call void @putch(i32 103)
-    call void @putch(i32 54)
-    call void @putch(i32 32)
-    call void @putch(i32 105)
-    call void @putch(i32 115)
-    call void @putch(i32 58)
-    call void @putint(i32 %temp214)
-    call void @putch(i32 59)
-    call void @putch(i32 126)
-    call void @putch(i32 10)
-    %temp215 = load i32, i32* @glo_7
-    call void @putch(i32 62)
-    call void @putch(i32 47)
-    call void @putch(i32 33)
-    call void @putch(i32 126)
-    call void @putch(i32 118)
-    call void @putch(i32 97)
-    call void @putch(i32 114)
-    call void @putch(i32 103)
-    call void @putch(i32 55)
-    call void @putch(i32 32)
-    call void @putch(i32 105)
-    call void @putch(i32 115)
-    call void @putch(i32 58)
-    call void @putint(i32 %temp215)
-    call void @putch(i32 59)
-    call void @putch(i32 126)
-    call void @putch(i32 10)
-    %temp216 = load i32, i32* @glo_8
-    call void @putch(i32 62)
-    call void @putch(i32 47)
-    call void @putch(i32 33)
-    call void @putch(i32 126)
-    call void @putch(i32 118)
-    call void @putch(i32 97)
-    call void @putch(i32 114)
-    call void @putch(i32 103)
-    call void @putch(i32 56)
-    call void @putch(i32 32)
-    call void @putch(i32 105)
-    call void @putch(i32 115)
-    call void @putch(i32 58)
-    call void @putint(i32 %temp216)
-    call void @putch(i32 59)
-    call void @putch(i32 126)
-    call void @putch(i32 10)
-    %temp217 = load i32, i32* @glo_9
-    call void @putch(i32 62)
-    call void @putch(i32 47)
-    call void @putch(i32 33)
-    call void @putch(i32 126)
-    call void @putch(i32 118)
-    call void @putch(i32 97)
-    call void @putch(i32 114)
-    call void @putch(i32 103)
-    call void @putch(i32 57)
-    call void @putch(i32 32)
-    call void @putch(i32 105)
-    call void @putch(i32 115)
-    call void @putch(i32 58)
-    call void @putint(i32 %temp217)
-    call void @putch(i32 59)
-    call void @putch(i32 126)
     call void @putch(i32 10)
     ret i32 0
 }

@@ -247,11 +247,28 @@ void pushGlobalRegister(const string& name, const Register& result) {
 }
 
 bool isGlobalRegister(const string& name) {
-    auto iter = registerTableList.at(0).directory.find(name);
-    if (iter != registerTableList.at(0).directory.end()) {
-        return true;
+    RegisterTable registerTable = registerTableList.at(currentRegisterTableId);
+    while (true) {
+        unordered_map<string, Register> directory = registerTable.directory;
+        auto iter = directory.begin();
+        iter = directory.find(name);
+        if (iter != directory.end() && registerTable.id == 0) {
+            return true;
+        } else if (iter != directory.end() && registerTable.id != 0) {
+            return false;
+        }
+
+        if (registerTable.fatherId == registerTable.id) {
+            break;
+        }
+        registerTable = registerTableList.at(registerTable.fatherId);
     }
     return false;
+//    auto iter = registerTableList.at(0).directory.find(name);
+//    if (iter != registerTableList.at(0).directory.end()) {
+//        return true;
+//    }
+//    return false;
 }
 
 Register searchRegister(const string& name) {

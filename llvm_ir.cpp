@@ -67,28 +67,36 @@ void storeInitial(const Register& basePtr, vector<Register> value) {
         if (basePtr.type.dim == 0) {
             storeRegister(basePtr, value.at(0));
         } else if (basePtr.type.dim == 1) {
-            int boundary = basePtr.type.boundary.at(0);
-            for (int index = (int) value.size(); index < boundary; index++) {
-                value.emplace_back(0);
-            }
-            for (int i = 0; i < boundary; i++) {
-                Register ptr = printllvmGetElementPtr(basePtr, i);
-                storeRegister(ptr, value.at(i));
+            if (value.at(0).type.dim == 0) {
+                int boundary = basePtr.type.boundary.at(0);
+                for (int index = (int) value.size(); index < boundary; index++) {
+                    value.emplace_back(0);
+                }
+                for (int i = 0; i < boundary; i++) {
+                    Register ptr = printllvmGetElementPtr(basePtr, i);
+                    storeRegister(ptr, value.at(i));
+                }
+            } else if (value.at(0).type.dim == 1) {
+                storeRegister(basePtr, value.at(0));
             }
         } else if (basePtr.type.dim == 2) {
-            int boundary_x = basePtr.type.boundary.at(0);
-            int boundary_y = basePtr.type.boundary.at(1);
-            int boundary = boundary_x * boundary_y;
-            for (int index = (int) value.size(); index < boundary; index++) {
-                value.emplace_back(0);
-            }
-            for (int i = 0; i < boundary_x; i++) {
-                for (int j = 0; j < boundary_y; j++) {
-                    if (i * boundary_y + j < value.size()) {
-                        Register ptr = printllvmGetElementPtr(basePtr, i, j);
-                        storeRegister(ptr, value.at(i * boundary_y + j));
+            if (value.at(0).type.dim == 0) {
+                int boundary_x = basePtr.type.boundary.at(0);
+                int boundary_y = basePtr.type.boundary.at(1);
+                int boundary = boundary_x * boundary_y;
+                for (int index = (int) value.size(); index < boundary; index++) {
+                    value.emplace_back(0);
+                }
+                for (int i = 0; i < boundary_x; i++) {
+                    for (int j = 0; j < boundary_y; j++) {
+                        if (i * boundary_y + j < value.size()) {
+                            Register ptr = printllvmGetElementPtr(basePtr, i, j);
+                            storeRegister(ptr, value.at(i * boundary_y + j));
+                        }
                     }
                 }
+            } else if (value.at(0).type.dim == 2) {
+                storeRegister(basePtr, value.at(0));
             }
         }
     }
@@ -193,6 +201,7 @@ void generateBlock(bool funcBlock) {
             generateBlockItem();
             if (funcBlock && isLastStmt() && !isReturn && currentFuncReturnType == 0) {
                 printllvm("    ret void\n");
+                Return = true;
             }
         }
     } else {
@@ -347,14 +356,14 @@ Register generateUnaryExp() {
     Register result = Register(0);
     if (isToken("PLUS", false, false, __FUNCTION__) || isToken("MINU", false, false, __FUNCTION__) || isToken("NOT", false, false, __FUNCTION__)) {
         if (isToken("PLUS", true, false, __FUNCTION__)) {
-            result = generateUnaryExp();
-        }
-        if (isToken("MINU", true, false, __FUNCTION__)) {
+            Register temp = generateUnaryExp();
+            result = getNewRegister(false, 0, false, false, type.id, type.dim);
+            printllvmcalculate(result, Register(0), temp, "PLUS");
+        } else if (isToken("MINU", true, false, __FUNCTION__)) {
             Register temp = generateUnaryExp();
             result = getNewRegister(false, 0, false, false, type.id, type.dim);
             printllvmcalculate(result, Register(0), temp, "MINU");
-        }
-        if (isToken("NOT", true, false, __FUNCTION__)) {
+        } else if (isToken("NOT", true, false, __FUNCTION__)) {
             Register temp_i32 = generateUnaryExp(); // temp是i32类型的
             Register temp_i1 = getNewRegister(false, 0, false,false, -2, 0);
             printllvmCompare(temp_i1, temp_i32, Register(0), "NEQ");
@@ -443,9 +452,14 @@ void generateConstDef(int type_id) {
     vector<int> info;
     Register ptr = Register(0);
     Register bound = Register(0);
+    bool flag = globalDeclare;
 
     while(isToken("LBRACK", true, false, __FUNCTION__)) {
+        if(!isGlobal) {
+            globalDeclare = true;
+        }
         bound = generateConstExp();
+        globalDeclare = flag;
         type.pushBoundary(bound.value);
         if (isToken("RBRACK", true, true,__FUNCTION__)) {
         } else {
@@ -534,9 +548,14 @@ void generateVarDef(int type_id) {
     vector<Register> value;
     Register ptr = Register(0);
     Register bound = Register(0);
+    bool flag = globalDeclare;
 
     while(isToken("LBRACK", true, false, __FUNCTION__)) {
+        if(!isGlobal) {
+            globalDeclare = true;
+        }
         bound = generateConstExp();
+        globalDeclare = flag;
         type.pushBoundary(bound.value);
         if (isToken("RBRACK", true, true, __FUNCTION__)) {
         } else {
@@ -927,7 +946,8 @@ void generateCond(const Register& true_label, const Register& false_label) {
 void generateLOrExp(const Register& true_label, const Register& false_label) {
     Type type = Type(0, 0);
     Register next_or_label = Register(0);
-    if (!isLastLAndExp()) {
+    bool last = isLastLAndExp();
+    if (!last) {
         next_or_label = getNewRegister(false, 0, false, false, -3, 0);
     } else {
         next_or_label = false_label;
@@ -936,7 +956,7 @@ void generateLOrExp(const Register& true_label, const Register& false_label) {
     Register right_i1 = Register(0);
     Register result = Register(0);
 
-    if (!isLastLAndExp()) {
+    if (!last) {
         // printllvmBranch(left_i1, true_label, false_label);
         printllvmLabel(next_or_label);
     }
@@ -967,7 +987,8 @@ void generateLOrExp(const Register& true_label, const Register& false_label) {
 Register generateLAndExp(const Register& true_label,  const Register& false_label) {
     Type type = Type(0, 0);
     Register next_and_label = Register(0);
-    if (!isLastEqExp()) {
+    bool last = isLastEqExp();
+    if (!last) {
         next_and_label = getNewRegister(false, 0, false,false, -3, 0);
     } else {
         next_and_label = true_label;
@@ -980,7 +1001,7 @@ Register generateLAndExp(const Register& true_label,  const Register& false_labe
     printllvmCompare(left_i1, left_i32, Register(0), "NEQ");
 
     printllvmBranch(left_i1, next_and_label, false_label);
-    if (!isLastEqExp()) {
+    if (!last) {
         printllvmLabel(next_and_label);
     }
 

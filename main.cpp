@@ -61,8 +61,9 @@ int main() {
 
     parseCompUnit();
 
-    generateIR();
-
+    if (ir) {
+        generateIR();
+    }
     fin.close();
     fout.close();
     ferr.close();

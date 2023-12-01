@@ -24,6 +24,13 @@ class BasicBlock : Value {
 
 };
 
+class Constant : User {
+    
+};
+
+class Instruction : User {
+
+};
 
 
 #endif //BUAA_COMPILER_IR_H
