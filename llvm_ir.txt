@@ -1,0 +1,10 @@
+int main() {
+    int i = 0;
+    int j = 2;
+    int m = 4;
+    int n = 2;
+    if (i < j == m && i == 2 || j == 2 < 3 && 2 || 1) {
+        printf("%d\n");
+    }
+    return 0;
+}

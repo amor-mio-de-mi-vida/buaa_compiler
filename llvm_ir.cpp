@@ -952,9 +952,7 @@ void generateLOrExp(const Register& true_label, const Register& false_label) {
     } else {
         next_or_label = false_label;
     }
-    Register left_i1 = generateLAndExp(true_label, next_or_label);
-    Register right_i1 = Register(0);
-    Register result = Register(0);
+    generateLAndExp(true_label, next_or_label);
 
     if (!last) {
         // printllvmBranch(left_i1, true_label, false_label);
@@ -971,20 +969,17 @@ void generateLOrExp(const Register& true_label, const Register& false_label) {
                 next_or_label0 = false_label;
             }
 
-            right_i1 = generateLAndExp(true_label, next_or_label0);
-            result = getNewRegister(false, 0, false, false, -2, 0);
-            printllvmcalculate(result, left_i1, right_i1, "OR");
+            generateLAndExp(true_label, next_or_label0);
 
-            printllvmBranch(result, true_label, next_or_label0);
+//            printllvmBranch(right_i1, true_label, next_or_label0);
             if (flag) {
                 printllvmLabel(next_or_label0);
             }
-            left_i1 = result;
         }
     }
 }
 
-Register generateLAndExp(const Register& true_label,  const Register& false_label) {
+void generateLAndExp(const Register& true_label,  const Register& false_label) {
     Type type = Type(0, 0);
     Register next_and_label = Register(0);
     bool last = isLastEqExp();
@@ -993,20 +988,13 @@ Register generateLAndExp(const Register& true_label,  const Register& false_labe
     } else {
         next_and_label = true_label;
     }
-    Register left_i32 = generateEqExp(); // 要求返回的数据类型为i32
-    Register right_i32 = Register(0);
-    Register result = Register(0);
-
-    Register left_i1 = getNewRegister(false, 0, false, false, -2, 0);
-    printllvmCompare(left_i1, left_i32, Register(0), "NEQ");
+    Register left_i1 = generateEqExp(); // 要求返回的数据类型为i1
+    Register right_i1 = Register(0);
 
     printllvmBranch(left_i1, next_and_label, false_label);
     if (!last) {
         printllvmLabel(next_and_label);
     }
-
-
-    Register right_i1 = Register(0);
 
     if (isToken("AND", false, false, __FUNCTION__)) {
         while ((isToken("AND", true, false, __FUNCTION__))) {
@@ -1017,28 +1005,19 @@ Register generateLAndExp(const Register& true_label,  const Register& false_labe
             } else {
                 next_and_label0 = true_label;
             }
-            right_i32 = generateEqExp();
-            right_i1 = getNewRegister(false, 0, false, false, -2, 0);
-            printllvmCompare(right_i1, right_i32, Register(0), "NEQ");
+            right_i1 = generateEqExp();
 
-            result = getNewRegister(false, 0, false, false, -2, 0);
-            printllvmcalculate(result, left_i1, right_i1, "AND");
-
-            printllvmBranch(result, next_and_label0, false_label);
+            printllvmBranch(right_i1, next_and_label0, false_label);
             if (flag) {
                 printllvmLabel(next_and_label0);
             }
-            left_i1 = result;
         }
-        return left_i1;
-    } else {
-        return left_i1;
     }
 }
 
 Register generateEqExp() {
     Type type = Type(-2, 0);
-    Register left = generateRelExp();
+    Register left = generateRelExp(); // 要求返回的类型都是i32
     Register right = Register(0);
     Register result = Register(0);
 
@@ -1049,23 +1028,22 @@ Register generateEqExp() {
             right = generateRelExp();
             result = getNewRegister(false,0,false, false, type.id, type.dim);
             printllvmCompare(result, left, right, op);
-            if (result.type.id == -2) {
-                result = printllvmZext(result);
-            }
-            if (result.hasValue) {
-                return result;
-            }
+            result = printllvmZext(result);
             left = result;
         }
-        return result;
+        Register temp = getNewRegister(false, 0, false, false, -2, 0);
+        printllvmCompare(temp, left, Register(0), "NEQ");
+        return temp;
     } else {
-        return left;
+        Register temp = getNewRegister(false, 0, false, false, -2, 0);
+        printllvmCompare(temp, left, Register(0), "NEQ");
+        return temp;
     }
 }
 
 Register generateRelExp() {
     Type type = Type(-2,0);
-    Register left = generateAddExp();
+    Register left = generateAddExp(); // 返回的类型为i32
     Register right = Register(0);
     Register result = Register(0);
 
@@ -1074,15 +1052,10 @@ Register generateRelExp() {
         while (isToken("LSS", true, false, __FUNCTION__) || isToken("GRE", true, false, __FUNCTION__)
                || isToken("LEQ", true, false, __FUNCTION__) || isToken("GEQ", true, false, __FUNCTION__)) {
             string op = (iter-1)->getType();
-            right = generateAddExp();
+            right = generateAddExp();  // 返回的类型为i32
             result = getNewRegister(false, 0, false, false, type.id, type.dim);
             printllvmCompare(result, left, right, op);
-            if (result.type.id == -2) {
-                result = printllvmZext(result);
-            }
-            if (result.hasValue) {
-                return result;
-            }
+            result = printllvmZext(result);
             left = result;
         }
         return result;
@@ -1095,9 +1068,16 @@ Register generateRelExp() {
 bool isLastLAndExp() {
     int i = 0;
     bool flag = true;
+    int count = 1;
     while (iter + i != TokenList.end()) {
-        if ((iter+i)->getType() == "RPARENT" || (iter+i)->getType()=="SEMICN") {
+        if (count == 0|| (iter+i)->getType()=="SEMICN") {
             break;
+        }
+        if ((iter+i)->getType() == "RPARENT") {
+            count--;
+        }
+        if ((iter+i)->getType() == "LPARENT") {
+            count++;
         }
         if ((iter+i)->getType() == "OR") {
             flag = false;
@@ -1110,9 +1090,16 @@ bool isLastLAndExp() {
 bool isLastEqExp() {
     int i = 0;
     bool flag = true;
+    int count = 1;
     while (iter+i != TokenList.end()) {
-        if ((iter+i)->getType() == "RPARENT" || (iter+i)->getType() == "OR" || (iter+i)->getType()=="SEMICN") {
+        if (count == 0 || (iter+i)->getType() == "OR" || (iter+i)->getType()=="SEMICN") {
             break;
+        }
+        if ((iter+i)->getType() == "RPARENT") {
+            count--;
+        }
+        if ((iter+i)->getType() == "LPARENT") {
+            count++;
         }
         if ((iter+i)->getType() == "AND") {
             flag = false;

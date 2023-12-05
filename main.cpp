@@ -10,7 +10,7 @@ using namespace std;
 
 int rowNo = 1;  // 当前解析的行号
 int colNo = 0;  // 当前解析的列号
-bool debug = false;
+bool debug = true;
 bool comment = false; // 处理可换行的注释
 bool lexer = false; // 词法分析debug开关
 bool parser = false; // 语法分析debug开关

@@ -48,7 +48,7 @@ Register generateFuncCall();
 void generateIfStmt();
 void generateCond(const Register& true_label, const Register& false_label);
 void generateLOrExp(const Register& true_label, const Register& false_label);
-Register generateLAndExp(const Register& true_label,  const Register& false_label);
+void generateLAndExp(const Register& true_label,  const Register& false_label);
 Register generateEqExp();
 Register generateRelExp();
 void generateForstmt();
