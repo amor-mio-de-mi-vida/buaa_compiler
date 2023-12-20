@@ -1,0 +1,1 @@
+zip result.zip *.cpp *.h
