@@ -5,7 +5,11 @@
 #ifndef BUAA_COMPILER_LLVM_IR_H
 #define BUAA_COMPILER_LLVM_IR_H
 #include "utils.h"
+#include "ir.h"
 
+void initFuncDef(const string& funcname);
+void initBasicBlock(const string& label);
+void addInstruction(Instruction* instruction);
 Register getNewRegister(int num);
 Register getNewRegister(bool hasValue, int value, bool isGlobal, bool isConst, int type_id, int dim);
 Register allocRegister(const Type& type);

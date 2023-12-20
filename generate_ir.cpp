@@ -14,12 +14,21 @@ extern ofstream fir;
 extern int registers;
 extern bool ir;
 extern bool debug;
-bool hasReturn = false;
 extern bool globalDeclare;
+int printfllvmstring = 0;
+unordered_map<string, string> printfllvmstrings;
+extern unordered_map<string, Function> MIPSfunctions;
+extern string currentMIPSfunction;
+extern unordered_map<string, BasicBlock> MIPSbasicblocks;
+extern string currentMIPSbasicblock;
+ofstream fir;
 
 void generateIR() {
+    const char* fileIRPath = "./llvm_ir.txt";
+    fir.open(fileIRPath, ios::out);
     init();
     generateCompUnit();
+    fir.close();
 }
 
 void init() {
@@ -70,26 +79,6 @@ int calculate(int left, int right, const string& op) {
     }
 }
 
-int compare(int left, int right, const string& op) {
-    if (op == "LSS") {
-        return left < right;
-    } else if (op == "LEQ") {
-        return left <= right;
-    } else if (op == "GRE") {
-        return left > right;
-    } else if (op == "GEQ") {
-        return left >= right;
-    } else if (op == "NOT") {
-        return right == 0;
-    } else if (op == "EQL") {
-        return left == right;
-    } else if (op == "NEQ") {
-        return left != right;
-    } else {
-        return -1;
-    }
-}
-
 void printllvmCompare(Register& result, const Register& left, const Register& right, const string& op) {
     Type type = Type(0, 0);
     Register leftValue = left;
@@ -126,6 +115,7 @@ void printllvmCompare(Register& result, const Register& left, const Register& ri
         string str = "    " + result.name + " = icmp " + "ne" + " " + type.to_str() + " " + leftValue.name +", " + rightValue.name + "\n";
         printllvm(str);
     }
+    addInstruction((Instruction *)new CalculateInst(result, left, right, op));
 }
 
 void printllvmcalculate(Register& result, const Register& left, const Register& right, const string& op) {
@@ -167,6 +157,7 @@ void printllvmcalculate(Register& result, const Register& left, const Register& 
             printllvm(str);
         }
     }
+    addInstruction((Instruction *)new CalculateInst(result, left, right, op));
 }
 
 void printllvmReturnStmt(int retype, const Register& name) {
@@ -179,8 +170,10 @@ void printllvmReturnStmt(int retype, const Register& name) {
 
     if (retype == 0) {
         str = "    ret void\n";
+        addInstruction((Instruction *)new ReturnInst(*new Register("void")));
     } else {
         str = "    ret " + type + " " + name.to_string() + "\n";
+        addInstruction((Instruction *)new ReturnInst(name));
     }
 
     printllvm(str);
@@ -221,6 +214,15 @@ void printllvmGlobalConst(const string& name, const Type& type) {
     printllvm(str);
 }
 
+
+/**
+ * @brief 生成llvm_ir时处理全局变量的初始化
+ *
+ * @param name 全局变量的名字
+ * @param type 全局变量的类型
+ * @param value 初始值的情况
+ */
+
 void printllvmGlobalAssign(const string& name, const Type& type, vector<Register> value) {
     string str;
     int boundary;
@@ -230,9 +232,6 @@ void printllvmGlobalAssign(const string& name, const Type& type, vector<Register
         str = to_string(value.at(0).value) + "\n";
     } if (type.dim == 1) {
         boundary = type.boundary.at(0);
-        for (int index = (int) value.size(); index < boundary; index++) {
-            value.emplace_back(0);
-        }
         bool flag = true; // 判断这一组是否都为0
         string str0;
         for (int i = 0; i < boundary; i++) {
@@ -251,9 +250,6 @@ void printllvmGlobalAssign(const string& name, const Type& type, vector<Register
         }
     } else if (type.dim == 2) {
         boundary = type.boundary.at(0) * type.boundary.at(1);
-        for (int index = (int) value.size(); index < boundary; index++) {
-            value.emplace_back(0);
-        }
         string str1;
         int flag0 = true;
         for (int i = 0; i < boundary; i += type.boundary.at(1)) {
@@ -309,30 +305,43 @@ void printllvmGetintStmt(const Register& left) {
     Register temp = getNewRegister(false, 0, false, false, 0, 0);
     string str1 = "    " + temp.name + " = call i32 @getint()\n";
     printllvm(str1);
+    addInstruction((Instruction *)new CallInst("getint"));
     string str2 = "    store i32 " + temp.name + ", i32* " + left.addr + "\n";
     printllvm(str2);
+    addInstruction((Instruction *)new StoreInst(temp, left));
     assignRegister(left, temp);
 }
 
 void printllvmPrintfStmt(const string& str, const vector<Register>& params) {
     int j = 0;
+    string asciiz;
+    int paraNum = 0;
     for (int i = 1; i < str.length() - 1; i++) {
         if (str.at(i) != '%') {
             if (str.at(i) != '\\') {
             string str1 = "    call void @putch(i32 " + to_string((int) (str.at(i))) + ")\n";
             printllvm(str1);
+            asciiz += str.at(i);
             } else {
                 i++;
                 string str1 = "    call void @putch(i32 10)\n";
                 printllvm(str1);
+                asciiz += "\\n";
             }
         } else {
+            paraNum++;
             i++;
             string str2 = "    call void @putint(" + params.at(j).type.to_str() + " " + params.at(j).name + ")\n";
             j++;
             printllvm(str2);
+            string name = "printllvmprintfasciiz" + to_string(printfllvmstring++);
+            printfllvmstrings.insert(make_pair(name, asciiz));
+            asciiz = "";
         }
     }
+    string name = "printllvmprintfasciiz" + to_string(printfllvmstring++);
+    printfllvmstrings.insert(make_pair(name, asciiz));
+    asciiz = "";
 }
 
 void printllvmCallFunc(Register& result, const string& name, const vector<Register>& params) {
@@ -425,16 +434,6 @@ Register printllvmGetElementPtr(const Register& basePtr, const Register& value_i
         result.type.boundary.pop_back();
         return result;
     } else if (basePtr.type.dim == 2 && basePtr.type.boundary.size() == 2) {
-//        Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim - 1);
-//        result.type.boundary = basePtr.type.boundary;
-//        result.type.boundary.pop_back();
-//        Register index = getNewRegister(false, 0, false, false, 0, 0);
-//        printllvmcalculate(index, value_i, Register(basePtr.type.boundary.at(1)), "MULT");
-//        string str = "    " + result.name + " = getelementptr " + result.type.to_str() + ", " +
-//                result.type.to_str() + "* " + basePtr.addr + ", i32 0, i32 " + index.name + "\n";
-//        printllvm(str);
-//        result.type.boundary.pop_back();
-//        return result;
         Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim - 1);
         string str = "    " + result.name + " = getelementptr " + basePtr.type.to_str() + ", " +
                     basePtr.type.to_str() + "* " + basePtr.addr + ", i32 0, i32 " +  value_i.name + ", i32 0\n";
@@ -446,17 +445,6 @@ Register printllvmGetElementPtr(const Register& basePtr, const Register& value_i
 
 Register printllvmGetElementPtr(const Register& basePtr, const Register& value_i, const Register& value_j) {
     if (basePtr.type.dim == 2 && basePtr.type.boundary.size() == 1) {
-//        Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim - 1);
-//        result.type.boundary = basePtr.type.boundary;
-//        string str = "    " + result.name + " = getelementptr " + result.type.to_str() + ", " +
-//                     result.type.to_str() + "* " + basePtr.addr + ", i32 " +
-//                     value_i.name + "\n";
-//        printllvm(str);
-//        Register result2 = getNewRegister(false, 0, false, false, result.type.id, result.type.dim - 1);
-//        string str2 = "    " + result2.name + " = getelementptr " + result.type.to_str() + ", " +
-//                      result.type.to_str() + "* " + result.name + ", i32 0, i32 " + value_j.name + "\n";
-//        printllvm(str2);
-//        return result2;
         Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim - 2);
         Type type = Type(basePtr.type.id, basePtr.type.dim - 1);
         type.boundary = basePtr.type.boundary;
@@ -479,35 +467,32 @@ Register printllvmGetElementPtr(const Register& basePtr, const Register& value_i
 void printllvmLabel(const Register& label) {
     string str = label.name.substr(1) + ":\n";
     printllvm(str);
+    initBasicBlock(label.name.substr(1));
 }
 
 void printllvmBranch(const Register& cond, const Register& stmt1, const Register& stmt2) {
     string str = "    br i1 " + cond.name + ", label " + stmt1.name + ", label " + stmt2.name + "\n\n";
     printllvm(str);
+    addInstruction((Instruction *)new BranchInst(cond, stmt1, stmt2));
 }
 
 void printllvmBranch(const string& name) {
     string str = "    br label " + name + "\n\n";
     printllvm(str);
+    addInstruction((Instruction *)new BranchLabelInst(name));
 }
 
 void printllvmBranch(const Register& label) {
     string str = "    br label " + label.name + "\n\n";
     printllvm(str);
+    addInstruction((Instruction *)new BranchLabelInst(label.name));
 }
-
-//Register printllvmTruncCond(const Register& cond) {
-//    Type type = Type (-2, 0);
-//    Register result = getNewRegister(false, 0, false, false, type.id, type.dim);
-//    string str = "    " + result.name + " = trunc " + typeToString(cond.type) + " " + cond.name + " to " + typeToString(type) + "\n";
-//    printllvm(str);
-//    return result;
-//}
 
 Register printllvmZext(Register& right) {
     Type type = Type(0,0);
     Register result = getNewRegister(false, 0, false, false, type.id, type.dim);
     string str = "    " + result.name + " = zext " + right.type.to_str() + " " + right.name + " to " + type.to_str() + "\n";
     printllvm(str);
+    addInstruction ((Instruction *)new ZextInst(right, result));
     return result;
 }

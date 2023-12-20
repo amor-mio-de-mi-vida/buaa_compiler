@@ -17,8 +17,8 @@
 					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
-			<Target title="hw3">
-				<Option output="/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/hw3" prefix_auto="0" extension_auto="0"/>
+			<Target title="buaa_compiler">
+				<Option output="/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/buaa_compiler" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
@@ -32,14 +32,14 @@
 					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 hw3"/>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 buaa_compiler"/>
 					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
 					<Clean command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
-			<Target title="hw3/fast">
-				<Option output="/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/hw3" prefix_auto="0" extension_auto="0"/>
+			<Target title="buaa_compiler/fast">
+				<Option output="/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/buaa_compiler" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
@@ -53,7 +53,7 @@
 					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 hw3/fast"/>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 buaa_compiler/fast"/>
 					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
 					<Clean command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/yanghesen/Desktop/buaa_compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
@@ -81,49 +81,55 @@
 			</Target>
 		</Build>
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/error.cpp">
-			<Option target="hw3"/>
+			<Option target="buaa_compiler"/>
 		</Unit>
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/error.h">
-			<Option target="hw3"/>
+			<Option target="buaa_compiler"/>
 		</Unit>
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/generate_ir.cpp">
-			<Option target="hw3"/>
+			<Option target="buaa_compiler"/>
 		</Unit>
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/generate_ir.h">
-			<Option target="hw3"/>
+			<Option target="buaa_compiler"/>
 		</Unit>
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/ir.cpp">
-			<Option target="hw3"/>
+			<Option target="buaa_compiler"/>
 		</Unit>
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/ir.h">
-			<Option target="hw3"/>
+			<Option target="buaa_compiler"/>
 		</Unit>
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/lexer.cpp">
-			<Option target="hw3"/>
+			<Option target="buaa_compiler"/>
 		</Unit>
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/lexer.h">
-			<Option target="hw3"/>
+			<Option target="buaa_compiler"/>
 		</Unit>
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/llvm_ir.cpp">
-			<Option target="hw3"/>
+			<Option target="buaa_compiler"/>
 		</Unit>
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/llvm_ir.h">
-			<Option target="hw3"/>
+			<Option target="buaa_compiler"/>
 		</Unit>
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/main.cpp">
-			<Option target="hw3"/>
+			<Option target="buaa_compiler"/>
+		</Unit>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/mips.cpp">
+			<Option target="buaa_compiler"/>
+		</Unit>
+		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/mips.h">
+			<Option target="buaa_compiler"/>
 		</Unit>
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/parser.cpp">
-			<Option target="hw3"/>
+			<Option target="buaa_compiler"/>
 		</Unit>
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/parser.h">
-			<Option target="hw3"/>
+			<Option target="buaa_compiler"/>
 		</Unit>
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/utils.cpp">
-			<Option target="hw3"/>
+			<Option target="buaa_compiler"/>
 		</Unit>
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/utils.h">
-			<Option target="hw3"/>
+			<Option target="buaa_compiler"/>
 		</Unit>
 		<Unit filename="/Users/yanghesen/Desktop/buaa_compiler/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>

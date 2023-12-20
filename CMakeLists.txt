@@ -3,7 +3,7 @@ project(buaa_compiler)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(hw3 main.cpp
+add_executable(buaa_compiler main.cpp
         error.h
         parser.cpp
         parser.h
@@ -17,4 +17,6 @@ add_executable(hw3 main.cpp
         generate_ir.h
         generate_ir.cpp
         ir.h
-        ir.cpp)
+        ir.cpp
+        mips.h
+        mips.cpp)

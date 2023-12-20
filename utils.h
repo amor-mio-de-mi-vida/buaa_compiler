@@ -95,6 +95,15 @@ public:
         this->isGlobal = false;
         this->isConst = true;
     }
+    Register(const string& name) {
+        this->id = 0;
+        this->name = name;
+        this->addr = "";
+        this->value = 0;
+        this->type = *new Type(0,0);
+        this->isGlobal = false;
+        this->isConst = false;
+    }
     string to_string() const;
 };
 

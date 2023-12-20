@@ -154,9 +154,15 @@ void checkParaType(int row, const char* str, const std::string& funcname, int in
 }
 
 void skip(int type) {
-    if (type == 0) {
+    if (type == 0) { //跳过直到下一个变量定义
+        while (iter != TokenList.end()) {
+            if ((iter->getType() == "COMMA" && (iter+1)->getType() == "IDENFR") || iter->getType() == "SEMICN") {
+                break;
+            }
+            iter++;
+        }
         return;
-    } else {
+    } else { // 跳过直到函数
         while (iter != TokenList.end()) {
             if (iter->getType() == "VOIDTK") {
                 break;

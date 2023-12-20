@@ -17,13 +17,36 @@ extern bool ir;
 extern std::vector<Token>::iterator iter;
 extern std::vector<Token> TokenList;
 extern unordered_map<int, Register> registerList;
-extern unordered_map<string, Register> globalFuncList;
 extern unordered_map<int, RegisterTable> registerTableList;
+unordered_map<string, GlobalValue> MIPSglobalValues;
+unordered_map<string, Function> MIPSfunctions;
+string currentMIPSfunction;
+unordered_map<string, BasicBlock> MIPSbasicblocks;
+string currentMIPSbasicblock;
 extern int currentFuncReturnType;
 bool Return = false;
 bool globalDeclare = true;
 vector<string> currentStmtEnd;
 vector<string> currentForEnd;
+
+void initFuncDef(const string& funcname) {
+    currentMIPSfunction = funcname;
+    MIPSfunctions.insert(make_pair(funcname, *new Function(funcname)));
+    currentMIPSbasicblock = funcname;
+    MIPSbasicblocks.insert(make_pair(funcname, *new BasicBlock(funcname)));
+    MIPSfunctions.at(funcname).basicBlocks.push_back(MIPSbasicblocks.at(funcname));
+}
+
+void initBasicBlock(const string& label) {
+    currentMIPSbasicblock = label;
+    MIPSbasicblocks.insert(make_pair(label, *new BasicBlock(label)));
+    MIPSfunctions.at(currentMIPSfunction).basicBlocks.push_back(MIPSbasicblocks.at(label));
+}
+
+void addInstruction(Instruction* instruction) {
+    MIPSbasicblocks.at(currentMIPSbasicblock).instructions.push_back(instruction);
+}
+
 
 Register getNewRegister(int num) {
     return *new Register(num);
@@ -40,6 +63,12 @@ Register getNewRegister(bool hasValue, int value, bool isGlobal, bool isConst, i
     }
 }
 
+/**
+ * @brief 为函数参数分配空间
+ *
+ * @param ptr
+ */
+
 void allocRegister(const Register& ptr) {
     if (ptr.type.id == 0 && ptr.type.dim == 0) {
         string str = "    " + ptr.name + " = alloca i32\n";
@@ -51,13 +80,22 @@ void allocRegister(const Register& ptr) {
         string str = "    " + ptr.name + " = alloca [" + to_string(ptr.type.boundary.at(0)) + " x i32]*\n";
         printllvm(str);
     }
+    addInstruction((Instruction *)new AllocInst(ptr, ptr.type));
 }
+
+/**
+ * @brief 为临时变量的定义分配空间
+ *
+ * @param type
+ * @return
+ */
 
 Register allocRegister(const Type& type) {
     Register ptr = Register(0);
     ptr = getNewRegister(false, 0, false, false, type.id, type.dim);
     ptr.type.boundary = type.boundary;
     string str = "    "+ ptr.name + " = alloca " + type.to_str() + "\n";
+    addInstruction((Instruction *)new AllocInst(ptr, type));
     printllvm(str);
     return ptr;
 }
@@ -69,9 +107,6 @@ void storeInitial(const Register& basePtr, vector<Register> value) {
         } else if (basePtr.type.dim == 1) {
             if (value.at(0).type.dim == 0) {
                 int boundary = basePtr.type.boundary.at(0);
-                for (int index = (int) value.size(); index < boundary; index++) {
-                    value.emplace_back(0);
-                }
                 for (int i = 0; i < boundary; i++) {
                     Register ptr = printllvmGetElementPtr(basePtr, i);
                     storeRegister(ptr, value.at(i));
@@ -84,9 +119,6 @@ void storeInitial(const Register& basePtr, vector<Register> value) {
                 int boundary_x = basePtr.type.boundary.at(0);
                 int boundary_y = basePtr.type.boundary.at(1);
                 int boundary = boundary_x * boundary_y;
-                for (int index = (int) value.size(); index < boundary; index++) {
-                    value.emplace_back(0);
-                }
                 for (int i = 0; i < boundary_x; i++) {
                     for (int j = 0; j < boundary_y; j++) {
                         if (i * boundary_y + j < value.size()) {
@@ -110,6 +142,7 @@ void storeRegister(const Register& ptr, const Register& value) {  // ptr是基�
         str = "    store " + value.type.to_str() + " " + value.name + ", " + ptr.type.to_str() + "* " +
                      ptr.addr + "\n";
     }
+    addInstruction((Instruction *) new StoreInst(value, ptr));
     printllvm(str);
 }
 
@@ -119,6 +152,7 @@ void loadRegister(const Register& ptr, Register& result) {
         str = "    " + result.name + " = load " + result.type.to_str() + ", " +
                      ptr.type.to_str() + "* " + ptr.addr + "\n";
     }
+    addInstruction((Instruction *)new LoadInst(result, ptr));
     printllvm(str);
 }
 
@@ -167,6 +201,8 @@ void generateCompUnit() {
 
 void generateMainFuncDef() {
     vector<Register> params;
+    initFuncDef("main");
+
     Register global = *new Register(registers++, "" ,"@main", 0, false, 0, 0, true, true);
     pushRegister("main", global);
     if (isToken("INTTK", true, true, __FUNCTION__)) {
@@ -201,6 +237,7 @@ void generateBlock(bool funcBlock) {
             generateBlockItem();
             if (funcBlock && isLastStmt() && !isReturn && currentFuncReturnType == 0) {
                 printllvm("    ret void\n");
+                addInstruction((Instruction *)new ReturnInst(Register("void")));
                 Return = true;
             }
         }
@@ -304,18 +341,6 @@ Register generateAddExp() {
         left = result;
     }
 
-//    if (isToken("PLUS", true, false, __FUNCTION__)) {
-//        Register right = generateAddExp();
-//        result = getNewRegister(false,0,false, false, type.id, type.dim);
-//        printllvmcalculate(result, left, right, "PLUS");
-//        return result;
-//    } else if (isToken("MINU", true, false, __FUNCTION__)) {
-//        Register right = generateAddExp();
-//        result = getNewRegister(false,0,false, false, type.id, type.dim);
-//        printllvmcalculate(result, left, right, "MINU");
-//        return result;
-//    }
-
     return left;
 }
 
@@ -332,22 +357,6 @@ Register generateMulExp() {
         left = result;
     }
 
-//    if(isToken("MULT", true, false, __FUNCTION__ )) {
-//        Register right = generateMulExp();
-//        result = getNewRegister(false,0,false, false, type.id, type.dim);
-//        printllvmcalculate(result, left, right, "MULT");
-//        return result;
-//    } else if (isToken("DIV", true, false, __FUNCTION__ )) {
-//        Register right = generateMulExp();
-//        result = getNewRegister(false,0,false, false, type.id, type.dim);
-//        printllvmcalculate(result, left, right, "DIV");
-//        return result;
-//    } else if (isToken("MOD", true, false, __FUNCTION__ )) {
-//        Register right = generateMulExp();
-//        result = getNewRegister(false,0,false, false, type.id, type.dim);
-//        printllvmcalculate(result, left, right, "MOD");
-//        return result;
-//    }
     return left;
 }
 
@@ -479,21 +488,32 @@ void generateConstDef(int type_id) {
         assert(0);
     }
 
+    int boundary;
+    if (type.dim == 0) {
+        if (value.empty()) {
+            value.emplace_back(0);
+        }
+    } else if (type.dim == 1) {
+        boundary = type.boundary.at(0);
+        for (int index = (int) value.size(); index < boundary; index++) {
+            value.emplace_back(0);
+        }
+    } else if (type.dim == 2) {
+        boundary = type.boundary.at(0) * type.boundary.at(1);
+        for (int index = (int) value.size(); index < boundary; index++) {
+            value.emplace_back(0);
+        }
+    }
+
     if (!isGlobal) {
         pushRegister(name, ptr);
         storeInitial(ptr, value);
     } else {
-        if (!value.empty()) {
-            printllvmGlobalAssign(name, type, value);
-            Register global = *new Register(registers++, "", "@"+name, value.at(0).value, true, type.id, type.dim, true, true);
-            global.type.boundary = type.boundary;
-            pushRegister(name, global);
-        } else {
-            printllvm("zeroinitializer\n");
-            Register global = *new Register(registers++, "", "@"+name, 0, true, type.id, type.dim, true, true);
-            global.type.boundary = type.boundary;
-            pushRegister(name, global);
-        }
+        printllvmGlobalAssign(name, type, value);
+        Register global = *new Register(registers++, "", "@"+name, value.at(0).value, true, type.id, type.dim, true, true);
+        global.type.boundary = type.boundary;
+        pushRegister(name, global);
+        MIPSglobalValues.insert(make_pair(name, *new GlobalValue(name, true, type, value)));
     }
 }
 
@@ -573,21 +593,32 @@ void generateVarDef(int type_id) {
         value = generateInitVal();
     }
 
+    int boundary;
+    if (type.dim == 0) {
+        if (value.empty()) {
+            value.emplace_back(0);
+        }
+    } else if (type.dim == 1) {
+        boundary = type.boundary.at(0);
+        for (int index = (int) value.size(); index < boundary; index++) {
+            value.emplace_back(0);
+        }
+    } else if (type.dim == 2) {
+        boundary = type.boundary.at(0) * type.boundary.at(1);
+        for (int index = (int) value.size(); index < boundary; index++) {
+            value.emplace_back(0);
+        }
+    }
+
     if (!isGlobal) {
         pushRegister(name, ptr);
         storeInitial(ptr, value);
     } else {
-        if (!value.empty()) {
-            printllvmGlobalAssign(name, type, value);
-            Register global = *new Register(registers++, "", "@"+name, value.at(0).value, true, type.id, type.dim, true, true);
-            global.type.boundary = type.boundary;
-            pushRegister(name, global);
-        } else {
-            printllvm("zeroinitializer\n");
-            Register global = *new Register(registers++, "", "@"+name, 0, true, type.id, type.dim, true, true);
-            global.type.boundary = type.boundary;
-            pushRegister(name, global);
-        }
+        printllvmGlobalAssign(name, type, value);
+        Register global = *new Register(registers++, "", "@"+name, value.at(0).value, true, type.id, type.dim, true, true);
+        global.type.boundary = type.boundary;
+        pushRegister(name, global);
+        MIPSglobalValues.insert(make_pair(name, *new GlobalValue(name, false, type, value)));
     }
 }
 
@@ -753,6 +784,8 @@ void generateFuncDef() {
     std::string funcname = iter->getName();
     parseIdent();
 
+    initFuncDef(funcname);
+
     Register global = *new Register(registers++, "" ,"@"+funcname, 0, false, stringToType(func_retype) - 1, 0, true, true);
     pushRegister(funcname, global);
 
@@ -780,8 +813,13 @@ void generateFuncDef() {
 
     if (!Return) {
         printllvm("    ret void\n");
+        addInstruction((Instruction *)new ReturnInst(Register("void")));
     }
     Return = false;
+
+    Function currentFunction = MIPSfunctions.at(funcname);
+    currentFunction.Fparams = params;
+
     popRegisterTable();
     printllvm("}\n\n");
 }
@@ -955,7 +993,6 @@ void generateLOrExp(const Register& true_label, const Register& false_label) {
     generateLAndExp(true_label, next_or_label);
 
     if (!last) {
-        // printllvmBranch(left_i1, true_label, false_label);
         printllvmLabel(next_or_label);
     }
 
@@ -971,7 +1008,6 @@ void generateLOrExp(const Register& true_label, const Register& false_label) {
 
             generateLAndExp(true_label, next_or_label0);
 
-//            printllvmBranch(right_i1, true_label, next_or_label0);
             if (flag) {
                 printllvmLabel(next_or_label0);
             }

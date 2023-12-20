@@ -12,10 +12,12 @@ void generateIR();
 void init();
 void printllvm(const string& str);
 int calculate(int left, int right, const string& op);
-int compare(int left, int right, const string& op);
+// 打印llvm计算指令
 void printllvmcalculate(Register& result, const Register& left, const Register& right, const string& op);
+// 打印llvm比较指令
 void printllvmCompare(Register& result, const Register& left, const Register& right, const string& op);
 void printllvmFuncDef(int retype, const string& name, const vector<Register>& params);
+// 打印llvm返回指令
 void printllvmReturnStmt(int retype, const Register& name);
 void printllvmGlobalConst(const string& name, const Type& type);
 void printllvmGlobalAssign(const string& name, const Type& type, vector<Register> value);
