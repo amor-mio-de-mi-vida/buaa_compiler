@@ -1,1 +1,1 @@
-zip buaa_compiler.zip *.cpp *.h
+zip buaa_compiler.zip *.cpp *.h *.txt *.json

@@ -425,16 +425,6 @@ Register printllvmGetElementPtr(const Register& basePtr, const Register& value_i
         result.type.boundary.pop_back();
         return result;
     } else if (basePtr.type.dim == 2 && basePtr.type.boundary.size() == 2) {
-//        Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim - 1);
-//        result.type.boundary = basePtr.type.boundary;
-//        result.type.boundary.pop_back();
-//        Register index = getNewRegister(false, 0, false, false, 0, 0);
-//        printllvmcalculate(index, value_i, Register(basePtr.type.boundary.at(1)), "MULT");
-//        string str = "    " + result.name + " = getelementptr " + result.type.to_str() + ", " +
-//                result.type.to_str() + "* " + basePtr.addr + ", i32 0, i32 " + index.name + "\n";
-//        printllvm(str);
-//        result.type.boundary.pop_back();
-//        return result;
         Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim - 1);
         string str = "    " + result.name + " = getelementptr " + basePtr.type.to_str() + ", " +
                     basePtr.type.to_str() + "* " + basePtr.addr + ", i32 0, i32 " +  value_i.name + ", i32 0\n";
@@ -446,17 +436,6 @@ Register printllvmGetElementPtr(const Register& basePtr, const Register& value_i
 
 Register printllvmGetElementPtr(const Register& basePtr, const Register& value_i, const Register& value_j) {
     if (basePtr.type.dim == 2 && basePtr.type.boundary.size() == 1) {
-//        Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim - 1);
-//        result.type.boundary = basePtr.type.boundary;
-//        string str = "    " + result.name + " = getelementptr " + result.type.to_str() + ", " +
-//                     result.type.to_str() + "* " + basePtr.addr + ", i32 " +
-//                     value_i.name + "\n";
-//        printllvm(str);
-//        Register result2 = getNewRegister(false, 0, false, false, result.type.id, result.type.dim - 1);
-//        string str2 = "    " + result2.name + " = getelementptr " + result.type.to_str() + ", " +
-//                      result.type.to_str() + "* " + result.name + ", i32 0, i32 " + value_j.name + "\n";
-//        printllvm(str2);
-//        return result2;
         Register result = getNewRegister(false, 0, false, false, basePtr.type.id, basePtr.type.dim - 2);
         Type type = Type(basePtr.type.id, basePtr.type.dim - 1);
         type.boundary = basePtr.type.boundary;

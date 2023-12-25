@@ -955,7 +955,6 @@ void generateLOrExp(const Register& true_label, const Register& false_label) {
     generateLAndExp(true_label, next_or_label);
 
     if (!last) {
-        // printllvmBranch(left_i1, true_label, false_label);
         printllvmLabel(next_or_label);
     }
 
@@ -971,7 +970,6 @@ void generateLOrExp(const Register& true_label, const Register& false_label) {
 
             generateLAndExp(true_label, next_or_label0);
 
-//            printllvmBranch(right_i1, true_label, next_or_label0);
             if (flag) {
                 printllvmLabel(next_or_label0);
             }
